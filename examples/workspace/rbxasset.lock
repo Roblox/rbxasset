@@ -1,13 +1,13 @@
 [assets.package]
-assetId = "125288232876669"
+assetId = "122373732145451"
 
 [assets.plugin]
-assetId = "80174631732146"
+assetId = "90616066886156"
 
 [images."package/icon.png"]
-assetId = "115367029120019"
+assetId = "97869612199401"
 hash = "fac185770cf5e824d4c0a9b59e547df42dc10011c5ad139bfc2c7e1507eef631"
 
 [images."plugin/icon.png"]
-assetId = "105616167657986"
+assetId = "91168078927982"
 hash = "fac185770cf5e824d4c0a9b59e547df42dc10011c5ad139bfc2c7e1507eef631"

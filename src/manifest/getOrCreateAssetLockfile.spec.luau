@@ -6,7 +6,7 @@ local getOrCreateAssetLockfile = require("./getOrCreateAssetLockfile")
 
 test.case("reads an asset lockfile from disk", function()
 	local lockfile = getOrCreateAssetLockfile("examples/package")
-	check.equal(lockfile.assets["package"].assetId, "76204828105556")
+	check.equal(lockfile.assets["package"].assetId, "120786139379662")
 end)
 
 test.case("creates a blank asset lockfile when not found on disk", function()
