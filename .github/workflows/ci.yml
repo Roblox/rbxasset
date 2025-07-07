@@ -17,10 +17,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow-external-github-orgs: true
 
-      - uses: lumin-org/setup-pesde@v0.4.1
-
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Run unit tests
         run: lune run test
@@ -35,10 +33,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow-external-github-orgs: true
 
-      - uses: lumin-org/setup-pesde@v0.4.1
-
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Lint
         run: lune run lint
@@ -48,15 +44,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: CompeyDev/setup-rokit@v0.1.2
-
-      - name: Install tools
-        run: rokit install --no-trust-check
-
-      - uses: lumin-org/setup-pesde@v0.4.1
+      - uses: Roblox/setup-foreman@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Setup Lune typedefs
         run: lune setup

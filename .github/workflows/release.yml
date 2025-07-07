@@ -22,10 +22,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow-external-github-orgs: true
 
-      - uses: lumin-org/setup-pesde@v0.4.1
-
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Build
         run: lune run build
@@ -35,44 +33,9 @@ jobs:
           path: ${{ env.BUILD_ARTIFACT_PATH }}
           name: rbxasset
 
-      # - uses: Roblox-ActionsCache/softprops-action-gh-release@v1
-      - uses: softprops/action-gh-release@v1
+      - uses: Roblox-ActionsCache/softprops-action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: ${{ env.BUILD_ARTIFACT_PATH }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-to-pesde-registry:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: Roblox/setup-foreman@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allow-external-github-orgs: true
-
-      - uses: lumin-org/setup-pesde@v0.4.1
-
-      - name: Install dependencies
-        run: pesde install
-
-      - name: Login to Pesde registry
-        run: pesde auth login --token ${{ secrets.PESDE_PUBLISH_TOKEN }}
-
-      - name: Publishing dry-run
-        if: github.event.release == null
-        run: pesde publish --dry-run
-
-      # The dry-run command returns an exit code of 0 even on failures so this
-      # step will manually fail the job if the dry-run failed to output the
-      # package archive
-      - name: Verify dry-run artifact
-        if: github.event.release == null
-        run: find package.tar.gz
-
-      - name: Publish to Pesde registry
-        if: github.event.release
-        run: pesde publish

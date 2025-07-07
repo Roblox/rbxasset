@@ -1,10 +1,7 @@
 # Build artifacts
 build
 temp
-
-# Pesde
-lune_packages
-pesde.lock
+pkg
 
 # Roblox
 *.rbxm*
