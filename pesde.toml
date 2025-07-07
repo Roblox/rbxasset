@@ -5,20 +5,13 @@ description = "Deploy from GitHub to the Roblox Creator Store"
 repository = "https://github.com/ghostnaps/rbxasset"
 license = "MIT"
 
-includes = [
-  ".luaurc",
-  "pesde.toml",
-  "src/**/*.luau",
-  "LICENSE",
-  "README.md",
-]
+includes = [".luaurc", "pesde.toml", "src/**/*.luau", "LICENSE", "README.md"]
 
 [target]
 environment = "lune"
 lib = "src/init.luau"
 
 [engines]
-lune = "^0.9.3"
 pesde = "^0.7.0-rc.4"
 
 [indices]
