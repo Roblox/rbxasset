@@ -66,6 +66,10 @@ jobs:
         shell: bash
         run: foreman list
 
+      - name: Run JohnnyMorganz__luau-lsp-1.52.0 directly
+        shell: bash
+        run: /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0 analyze --platform=standard --ignore="**/pkg/**" .lune src examples
+
       - name: Run luau-lsp manually
         shell: bash
         run: luau-lsp analyze --platform=standard --ignore="**/pkg/**" .lune src examples
