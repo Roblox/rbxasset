@@ -1,5 +1,5 @@
 [tools]
-luau-lsp = { source = "JohnnyMorganz/luau-lsp", version = "=1.52.0" }
+luau-lsp = { source = "JohnnyMorganz/luau-lsp", version = "=1.48.0" }
 # lune = { source = "lune-org/lune", version = "=0.9.4" }
 # rojo = { source = "rojo-rbx/rojo", version = "=7.5.0" }
 # selene = { source = "kampfkarren/selene", version = "=0.28.0" }
