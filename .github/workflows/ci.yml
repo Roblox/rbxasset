@@ -54,7 +54,7 @@ jobs:
 
       - name: Run just luau-lsp, no arguments
         shell: bash
-        run: RUST_BACKTRACE=1 luau-lsp
+        run: luau-lsp
 
   analyze:
     runs-on: ubuntu-latest
