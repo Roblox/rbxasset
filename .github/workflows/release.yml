@@ -10,8 +10,7 @@ on:
 
 jobs:
   build-standalone-zip:
-    runs-on: [self-hosted, generic-linux]
-    container: docker.artifactory.rbx.com/rbx-lua-build-tools:v1.0.1
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       BUILD_ARTIFACT_PATH: build/rbxasset.zip

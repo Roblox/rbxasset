@@ -8,8 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: [self-hosted, generic-linux]
-    container: docker.artifactory.rbx.com/rbx-lua-build-tools:v1.0.1
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -26,8 +25,7 @@ jobs:
         run: lune run test
 
   code-quality:
-    runs-on: [self-hosted, generic-linux]
-    container: docker.artifactory.rbx.com/rbx-lua-build-tools:v1.0.1
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -44,8 +42,7 @@ jobs:
         run: lune run lint
 
   analyze:
-    runs-on: [self-hosted, generic-linux]
-    container: docker.artifactory.rbx.com/rbx-lua-build-tools:v1.0.1
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
