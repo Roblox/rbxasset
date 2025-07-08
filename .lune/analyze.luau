@@ -6,4 +6,4 @@ local foldersToAnalyze = {
 	"examples",
 }
 
-run("luau-lsp", { "analyze", "--ignore=**/pkg/**", table.unpack(foldersToAnalyze) })
+run("luau-lsp", { "analyze", `--ignore="**/pkg/**"`, "--platform=standard", table.unpack(foldersToAnalyze) })

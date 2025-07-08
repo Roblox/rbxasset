@@ -41,21 +41,6 @@ jobs:
       - name: Lint
         run: lune run lint
 
-  analyze-sandbox:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: Roblox/setup-foreman@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allow-external-github-orgs: true
-
-      - name: Run just luau-lsp, no arguments
-        shell: bash
-        run: luau-lsp
-
   analyze:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -72,35 +57,6 @@ jobs:
 
       - name: Setup Lune typedefs
         run: lune setup
-
-      - name: What's in the path?
-        shell: bash
-        run: echo $PATH
-
-      - name: List Foreman tools
-        shell: bash
-        run: foreman list
-
-      - name: Run JohnnyMorganz__luau-lsp-1.52.0 directly
-        continue-on-error: true
-        shell: bash
-        run: |
-          chmod +x /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0
-          /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0 analyze --platform=standard --ignore="**/pkg/**" .lune src examples
-
-      - name: Run luau-lsp manually
-        continue-on-error: true
-        shell: bash
-        run: luau-lsp analyze --platform=standard --ignore="**/pkg/**" .lune src examples
-        env:
-          RUST_BACKTRACE: 1
-
-      - name: Run just luau-lsp, no arguments
-        continue-on-error: true
-        shell: bash
-        run: luau-lsp
-        env:
-          RUST_BACKTRACE: 1
 
       - name: Analyze
         run: lune run analyze
