@@ -1,18 +1,34 @@
 # rbxasset
 
+[![CI](https://github.com/Roblox/rbxasset/actions/workflows/ci.yml/badge.svg)](https://github.com/Roblox/rbxasset/actions/workflows/ci.yml)
+
+Deploy rbxm files from GitHub to the Creator Store.
+
 # Installation
 
-Requires [Lune](https://github.com/lune-org/lune) 0.9.3+
+> [!NOTE]
+> [Lune](https://github.com/lune-org/lune) v0.9.3+ is required.
+
+## Prebuilt zip (recommended)
+
+[Download the latest release](https://github.com/Roblox/rbxasset/releases/latest) and unzip it where you will require it via a Luau script.
+
+## Manual
+
+> [!NOTE]
+> [Foreman](https://github.com/Roblox/foreman) v1.6.2+ is required.
+
+Run the following commands to clone the repo, install dependencies, and build rbxasset.
 
 ```sh
-$ git clone https://github.com/ghostnaps/rbxasset.git
+git clone https://github.com/ghostnaps/rbxasset.git
+cd rbxasset
+foreman install
+lune run install
+lune run build
 ```
 
-Then define a Luau script to use it:
-
-```luau
-local rbxasset = require("./path/to/rbxasset")
-```
+From there, drag and drop `build/rbxasset` to a place where you will require it via a Luau script.
 
 # Usage
 
@@ -122,4 +138,14 @@ Environments define where an asset will be deployed to. Only one environment is 
 | `universeId`  | `number`           | The `game.GameId` of an experience that will be used for Luau Execution. The experience must be owned by the asset creator  |
 | `placeId`     | `number`           | The `game.PlaceId` of an experience that will be used for Luau Execution. The experience must be owned by the asset creator |
 
+# Contributing
 
+We are not currently accepting community contributions. This may change in the future.
+
+# License
+
+The contents of this repository are available under the MIT License. For full license text, see [LICENSE](LICENSE).
+
+# Code of conduct
+
+To maintain an open, welcoming, diverse, inclusive, and healthy community, this project enforces an adapted version of the Contributor Covenant. For more information, see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
