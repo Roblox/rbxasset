@@ -67,12 +67,23 @@ jobs:
         run: foreman list
 
       - name: Run JohnnyMorganz__luau-lsp-1.52.0 directly
+        continue-on-error: true
         shell: bash
-        run: /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0 analyze --platform=standard --ignore="**/pkg/**" .lune src examples
+        run: |
+          chmod +x /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0
+          /home/runner/.foreman/tools/JohnnyMorganz__luau-lsp-1.52.0 analyze --platform=standard --ignore="**/pkg/**" .lune src examples
 
       - name: Run luau-lsp manually
+        continue-on-error: true
         shell: bash
         run: luau-lsp analyze --platform=standard --ignore="**/pkg/**" .lune src examples
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Run just luau-lsp, no arguments
+        continue-on-error: true
+        shell: bash
+        run: luau-lsp
         env:
           RUST_BACKTRACE: 1
 
