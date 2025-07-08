@@ -62,6 +62,10 @@ jobs:
         shell: bash
         run: echo $PATH
 
+      - name: List Foreman tools
+        shell: bash
+        run: foreman list
+
       - name: Run luau-lsp manually
         shell: bash
         run: luau-lsp analyze --platform=standard --ignore="**/pkg/**" .lune src examples
