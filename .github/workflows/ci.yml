@@ -60,7 +60,7 @@ jobs:
 
       - name: Run luau-lsp manually
         shell: bash
-        run: luau-lsp analyze --ignore=**/pkg/** .lune src examples
+        run: luau-lsp analyze --ignore="**/pkg/**" .lune src examples
 
       - name: Analyze
         run: lune run analyze
