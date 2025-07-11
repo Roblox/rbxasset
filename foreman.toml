@@ -1,6 +1,5 @@
 [tools]
-# MUS-2103 TODO: Re-enable analysis once Foreman can install luau-lsp
-# luau-lsp = { source = "JohnnyMorganz/luau-lsp", version = "=1.52.0" }
+luau-lsp = { source = "JohnnyMorganz/luau-lsp", version = "=1.52.0" }
 lune = { source = "lune-org/lune", version = "=0.9.4" }
 rojo = { source = "rojo-rbx/rojo", version = "=7.5.0" }
 selene = { source = "kampfkarren/selene", version = "=0.28.0" }
