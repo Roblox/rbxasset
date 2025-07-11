@@ -9,7 +9,7 @@ local INCLUDES = {
 	"README.md",
 
 	"src/",
-	"lune_packages/",
+	"pkg/",
 }
 
 local BUILD_PATH = "build"

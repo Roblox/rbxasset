@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
@@ -17,16 +18,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow-external-github-orgs: true
 
-      - uses: lumin-org/setup-pesde@v0.4.1
-
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Run unit tests
         run: lune run test
 
   code-quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
@@ -35,31 +35,30 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow-external-github-orgs: true
 
-      - uses: lumin-org/setup-pesde@v0.4.1
-
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Lint
         run: lune run lint
 
   analyze:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
-      - uses: CompeyDev/setup-rokit@v0.1.2
-
-      - name: Install tools
-        run: rokit install --no-trust-check
-
-      - uses: lumin-org/setup-pesde@v0.4.1
+      - uses: Roblox/setup-foreman@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: pesde install
+        run: lune run install
 
       - name: Setup Lune typedefs
         run: lune setup
 
+      # MUS-2103 TODO: This will error in CI until Foreman is updated to install
+      # the correct linux binary for luau-lsp
       - name: Analyze
         run: lune run analyze

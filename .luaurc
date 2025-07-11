@@ -2,7 +2,7 @@
   "languageMode": "strict",
   "aliases": {
     "root": "src",
-    "pkg": "lune_packages",
+    "pkg": "pkg",
     "lune": "~/.lune/.typedefs/0.9.3"
   }
 }
