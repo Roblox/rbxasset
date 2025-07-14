@@ -57,7 +57,7 @@ Then create a Luau script to handle the deployment:
 -- .lune/publish.luau
 local process = require("@lune/process")
 
-local rbxasset = require("./path/to/rbxasset/src")
+local rbxasset = require("./path/to/rbxasset")
 
 local apiKey = process.args[1]
 assert(apiKey, "argument #1 must be a valid Open Cloud API key")
