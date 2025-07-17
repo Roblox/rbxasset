@@ -21,7 +21,7 @@ Deploy rbxm files from GitHub to the Creator Store.
 Run the following commands to clone the repo, install dependencies, and build rbxasset.
 
 ```sh
-git clone https://github.com/ghostnaps/rbxasset.git
+git clone https://github.com/Roblox/rbxasset.git
 cd rbxasset
 foreman install
 lune run install
