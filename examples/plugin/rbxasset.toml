@@ -7,7 +7,7 @@ icon = "icon.png"
 type = "Plugin"
 
 [environments.production]
-creatorId = 608082596
-creatorType = "Group"
-universeId = 7943381724
-placeId = 74265882577854
+creatorId = 8701739411
+creatorType = "User"
+universeId = 8046529594
+placeId = 87060735635538
