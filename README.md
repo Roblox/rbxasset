@@ -7,7 +7,7 @@ Deploy rbxm files from GitHub to the Creator Store.
 # Installation
 
 > [!NOTE]
-> [Lune](https://github.com/lune-org/lune) v0.9.3+ is required.
+> [Lute](https://github.com/luau-lang/lute) v0.1.0-nightly.20251023+ is required.
 
 ## Prebuilt zip (recommended)
 
@@ -24,8 +24,8 @@ Run the following commands to clone the repo, install dependencies, and build rb
 git clone https://github.com/Roblox/rbxasset.git
 cd rbxasset
 foreman install
-lune run install
-lune run build
+lute scripts/install.luau
+lute scripts/build.luau
 ```
 
 From there, drag and drop `build/rbxasset` to a place where you will require it via a Luau script.
@@ -54,12 +54,14 @@ This defines a `default` asset and a `production` environment to deploy to.
 Then create a Luau script to handle the deployment:
 
 ```luau
--- .lune/publish.luau
-local process = require("@lune/process")
+-- scripts/publish.luau
+local process = require("@lute/process")
 
 local rbxasset = require("./path/to/rbxasset")
 
-local apiKey = process.args[1]
+local args = { ... }
+
+local apiKey = args[1]
 assert(apiKey, "argument #1 must be a valid Open Cloud API key")
 
 -- The rbxm file needs to be built manually. rbxasset makes no assumptions about
@@ -72,7 +74,7 @@ rbxasset.publishPackageAsync(process.cwd, "default", apiKey)
 ```
 
 ```sh
-$ lune run publish <API_KEY>
+$ lute scripts/publish.luau <API_KEY>
 ```
 
 Where `<API_KEY>` represents an Open Cloud API key. See below for the exact setup for the key.
