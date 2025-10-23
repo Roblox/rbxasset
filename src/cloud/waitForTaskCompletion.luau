@@ -1,4 +1,4 @@
-local json = require("@lute/std/json")
+local json = require("@std/json")
 local task = require("@lute/task")
 
 local fetch = require("@root/requests/fetch")

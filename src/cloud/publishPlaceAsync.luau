@@ -1,5 +1,5 @@
 local fs = require("@lute/fs")
-local json = require("@lute/std/json")
+local json = require("@std/json")
 
 local fetch = require("@root/requests/fetch")
 local logging = require("@root/logging")

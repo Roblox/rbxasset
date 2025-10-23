@@ -1,5 +1,5 @@
 local crypto = require("@lute/crypto")
-local json = require("@lute/std/json")
+local json = require("@std/json")
 
 type FormField = {
 	value: any,
