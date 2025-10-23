@@ -1,11 +1,9 @@
 -- local process = require("@lute/process")
 
-local frktest = require("@pkg/frktest")
+local test = require("@std/test")
 
 local logging = require("@root/logging")
 local run = require("@root/lib/run")
-
-local reporter = frktest._reporters.lune_console_reporter
 
 local function loadTestCases()
 	local output = run("find", { "src", "-iname", "*.spec.luau" })
@@ -22,8 +20,9 @@ end
 
 loadTestCases()
 
-reporter.init()
-local success = frktest.run()
+test.setreporter(function(result)
+	-- process.exit(if success then 0 else 1)
+	assert(result.failed > 0, "one or more unit tests failed")
+end)
 
--- process.exit(if success then 0 else 1)
-assert(success, "one or more unit tests failed")
+test.run()

@@ -1,11 +1,13 @@
-local frktest = require("@pkg/frktest")
-local test = frktest.test
-local check = frktest.assert.check
+local assert = require("@std/assert")
+local test = require("@std/test")
 
 local types = require("./types")
 
-test.suite("validateManifest", function()
-	test.case("accepts minimal manifest", function()
+-- FIXME: The `assert` arg to `case` resolves to an error type right now so
+-- we're requiring `@std/assert` manually
+
+test.suite("validateManifest", function(suite)
+	suite:case("accepts minimal manifest", function(_assert)
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -24,10 +26,10 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_true(success)
+		assert.eq(success, true)
 	end)
 
-	test.case("accepts optional manifest values", function()
+	suite:case("accepts optional manifest values", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -49,10 +51,10 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_true(success)
+		assert.eq(success, true)
 	end)
 
-	test.case("denies empty assets object", function()
+	suite:case("denies empty assets object", function()
 		local success, message = types.validateManifest({
 			assets = {},
 			environments = {
@@ -65,11 +67,11 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
-		check.equal(message, "at least one asset must be defined in the manifest")
+		assert.eq(success, false)
+		assert.eq(message, "at least one asset must be defined in the manifest")
 	end)
 
-	test.case("denies empty environments object", function()
+	suite:case("denies empty environments object", function()
 		local success, message = types.validateManifest({
 			assets = {
 				main = {
@@ -84,11 +86,11 @@ test.suite("validateManifest", function()
 			environments = {},
 		})
 
-		check.is_false(success)
-		check.equal(message, "at least one environment must be defined in the manifest")
+		assert.eq(success, false)
+		assert.eq(message, "at least one environment must be defined in the manifest")
 	end)
 
-	test.case("assets must map back to a valid environment", function()
+	suite:case("assets must map back to a valid environment", function()
 		local success, message = types.validateManifest({
 			assets = {
 				main = {
@@ -110,11 +112,11 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
-		check.equal(message, `asset "main" attempts to use the environment "does-not-exist" which does not exist`)
+		assert.eq(success, false)
+		assert.eq(message, `asset "main" attempts to use the environment "does-not-exist" which does not exist`)
 	end)
 
-	test.case("denies optional manifest values of the wrong type", function()
+	suite:case("denies optional manifest values of the wrong type", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -135,16 +137,16 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
+		assert.eq(success, false)
 	end)
 
-	test.case("denies empty object", function()
+	suite:case("denies empty object", function()
 		local success = types.validateManifest({})
 
-		check.is_false(success)
+		assert.eq(success, false)
 	end)
 
-	test.case("denies invalid types", function()
+	suite:case("denies invalid types", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -163,12 +165,12 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
+		assert.eq(success, false)
 	end)
 end)
 
-test.suite("validateLockfile", function()
-	test.case("must have an assetId", function()
+test.suite("validateLockfile", function(suite)
+	suite:case("must have an assetId", function()
 		local success = types.validateLockfile({
 			assets = {
 				foo = {
@@ -178,10 +180,10 @@ test.suite("validateLockfile", function()
 			images = {},
 		})
 
-		check.is_true(success)
+		assert.eq(success, true)
 	end)
 
-	test.case("handles storing images", function()
+	suite:case("handles storing images", function()
 		local success = types.validateLockfile({
 			assets = {
 				foo = {
@@ -196,12 +198,12 @@ test.suite("validateLockfile", function()
 			},
 		})
 
-		check.is_true(success)
+		assert.eq(success, true)
 	end)
 
-	test.case("denies empty object", function()
+	suite:case("denies empty object", function()
 		local success = types.validateLockfile({})
 
-		check.is_false(success)
+		assert.eq(success, false)
 	end)
 end)

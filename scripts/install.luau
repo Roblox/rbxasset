@@ -7,7 +7,6 @@ local PACKAGE_INDEX_NAME = "_Index"
 
 local function installGitDependencies()
 	local repos = {
-		{ git = "itsfrank/frktest@31770327", main = "src" },
 		{ git = "osyrisrblx/t@1dbfccc1", main = "lib" },
 	}
 

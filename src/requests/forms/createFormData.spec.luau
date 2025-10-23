@@ -1,6 +1,5 @@
-local frktest = require("@pkg/frktest")
-local test = frktest.test
-local check = frktest.assert.check
+local assert = require("@std/assert")
+local test = require("@std/test")
 
 local createFormData = require("./createFormData")
 
@@ -36,7 +35,7 @@ test.case("automatically converts objects to json", function()
 
 	local match = formData.body:match('{"bar":true,"baz":"str"}')
 
-	check.not_nil(match)
+	assert.neq(match, nil)
 end)
 
 test.case("body supports multiple parts", function()
@@ -85,5 +84,5 @@ test.case("the boundary contains LuauFormBoundary", function()
 		},
 	})
 	local match = formData.boundary:match("LuauFormBoundary")
-	check.not_nil(match)
+	assert.neq(match, nil)
 end)
