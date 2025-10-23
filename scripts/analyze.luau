@@ -8,8 +8,8 @@ local foldersToAnalyze = {
 
 run("luau-lsp", {
 	"analyze",
+	"--settings=.vscode/settings.json",
 	`--ignore="**/pkg/**"`,
 	"--platform=standard",
-	"--flag:LuauSolverV2=true",
 	table.unpack(foldersToAnalyze),
 })
