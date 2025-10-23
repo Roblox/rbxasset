@@ -1,3 +1,4 @@
+local crypto = require("@lute/crypto")
 local fs = require("@lute/fs")
 
 local createImageAsync = require("@root/requests/createImageAsync")
@@ -14,6 +15,10 @@ type PendingImage = {
 	filename: string,
 	assetId: string,
 }
+
+local function toSha256String(str: string): string
+	return buffer.tostring(crypto.digest(crypto.hash.sha256, str))
+end
 
 local function publishImagesAsync(
 	projectPath: string,
@@ -32,7 +37,7 @@ local function publishImagesAsync(
 
 		logging.info(`syncing package icon at {iconPath}`)
 
-		local iconHash = serde.hash("sha256", fs.readfiletostring(iconPath))
+		local iconHash = toSha256String(fs.readfiletostring(iconPath))
 
 		if existingImages and existingImages[icon] and existingImages[icon].hash == iconHash then
 			logging.debug(`hashes match for {iconPath}, skipping...`)
@@ -50,11 +55,12 @@ local function publishImagesAsync(
 			local assetId = if operation.response then operation.response.assetId else nil
 
 			if assetId then
-				table.insert(pendingImages, {
+				local pendingImage: PendingImage = {
 					path = iconPath,
 					filename = icon,
 					assetId = assetId,
-				})
+				}
+				table.insert(pendingImages, pendingImage)
 
 				logging.debug(`image uploaded successfully`)
 			else
@@ -69,7 +75,7 @@ local function publishImagesAsync(
 
 		for index, thumbnailFilename in thumbnails do
 			local thumbnailPath = `{projectPath}/{thumbnailFilename}`
-			local thumbnailHash = serde.hash("sha256", fs.readfiletostring(thumbnailPath))
+			local thumbnailHash = toSha256String(fs.readfiletostring(thumbnailPath))
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
 			if existingThumbnail and existingThumbnail.hash == thumbnailHash then
@@ -91,11 +97,12 @@ local function publishImagesAsync(
 				local assetId = operation.response.assetId
 
 				if assetId then
-					table.insert(pendingImages, {
+					local pendingImage: PendingImage = {
 						path = thumbnailPath,
 						filename = thumbnailFilename,
 						assetId = assetId,
-					})
+					}
+					table.insert(pendingImages, pendingImage)
 
 					logging.debug(`image uploaded successfully`)
 				else
@@ -106,13 +113,13 @@ local function publishImagesAsync(
 	end
 
 	if #pendingImages > 0 then
-		local newAssetLockfile = table.clone(assetLockfile or {})
+		local newAssetLockfile = table.clone(assetLockfile or {} :: types.Lockfile)
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,
-				hash = serde.hash("sha256", fs.readfiletostring(pendingImage.path)),
+				hash = toSha256String(fs.readfiletostring(pendingImage.path)),
 			}
 
 			logging.debug(

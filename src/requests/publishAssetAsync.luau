@@ -52,7 +52,7 @@ local function publishAssetAsync(
 			description = asset.description,
 		})
 
-		local newLockfile = join(lockfile, {
+		local newLockfile: types.Lockfile = join(lockfile, {
 			assets = join(lockfile.assets, {
 				[assetName] = join(lockfile.assets[assetName], {
 					assetId = assetId,

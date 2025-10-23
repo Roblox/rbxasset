@@ -28,10 +28,10 @@ local function executeLuauTask(
 	logging.debug(`task created: {luauTask.path}`)
 
 	logging.info("waiting for task to complete...")
-	luauTask = waitForTaskCompletion(luauTask.path, apiKey)
-	logging.debug(`task is now in {luauTask.state} state`)
+	local completedLuauTask = waitForTaskCompletion(luauTask.path, apiKey)
+	logging.debug(`task is now in {completedLuauTask.state} state`)
 
-	local logs = fetchLuauTaskLogs(luauTask.path, apiKey)
+	local logs = fetchLuauTaskLogs(completedLuauTask.path, apiKey)
 	if #logs == 0 then
 		logging.info("the task did not produce any logs")
 		return {}
@@ -51,17 +51,15 @@ local function executeLuauTask(
 		end
 	end
 
-	if luauTask.state == "COMPLETE" then
-		local output = luauTask.output
-
-		if output["results"] then
+	if completedLuauTask.state == "COMPLETE" then
+		if completedLuauTask.output.results then
 			logging.info("task output:")
-			logging.info(json.serialize(output["results"], true))
+			logging.info(json.serialize(completedLuauTask.output.results, true))
 		else
 			logging.info("the task did not return any results")
 		end
 	else
-		logging.err(`Task failed, error:\n{json.serialize(luauTask.error)}`)
+		logging.err(`Task failed, error:\n{json.serialize(completedLuauTask.error)}`)
 	end
 
 	return variables

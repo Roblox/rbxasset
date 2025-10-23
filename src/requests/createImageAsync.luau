@@ -43,7 +43,8 @@ local function createImageAsync(
 		body = formData.body,
 	})
 
-	local body = json.deserialize(res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local body: any = json.deserialize(res.body)
 
 	return waitForAssetOperationAsync(body.operationId, apiKey)
 end

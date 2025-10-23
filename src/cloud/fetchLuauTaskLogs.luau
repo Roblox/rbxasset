@@ -9,7 +9,8 @@ local function fetchLuauTaskLogs(taskPath: string, apiKey: string): { string }
 		},
 	})
 
-	local logs = json.deserialize(res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local logs: any = json.deserialize(res.body)
 
 	if #logs["luauExecutionSessionTaskLogs"] == 0 then
 		return {} -- no logs found

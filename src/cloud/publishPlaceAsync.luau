@@ -21,7 +21,7 @@ local function publishPlaceAsync(
 	local res =
 		fetch(`https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType={versionType}`, {
 			method = "POST",
-			body = fs.readfiletostringtostring(placePath),
+			body = fs.readfiletostring(placePath),
 			headers = {
 				["x-api-key"] = apiKey,
 				["Content-Type"] = "application/xml",
@@ -30,8 +30,12 @@ local function publishPlaceAsync(
 		})
 
 	if res.ok then
-		local body = json.deserialize(res.body)
-		return body.versionNumber :: number
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+		local body: any = json.deserialize(res.body)
+
+		if typeof(body) == "table" and next(body) ~= nil then
+			return body.versionNumber :: number
+		end
 	end
 	return -1
 end

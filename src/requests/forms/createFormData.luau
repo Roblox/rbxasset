@@ -1,3 +1,4 @@
+local crypto = require("@lute/crypto")
 local json = require("@lute/std/json")
 
 type FormField = {
@@ -30,7 +31,9 @@ local function createFormDataBody(boundary: string, data: { [string]: FormField 
 end
 
 local function createFormData(data: { [string]: FormField })
-	local boundary = "LuauFormBoundary" .. serde.hash("md5", tostring(math.random()))
+	local hash = buffer.tostring(crypto.digest(crypto.hash.md5, tostring(math.random())))
+
+	local boundary = "LuauFormBoundary" .. hash
 	local body = createFormDataBody(boundary, data)
 
 	return {

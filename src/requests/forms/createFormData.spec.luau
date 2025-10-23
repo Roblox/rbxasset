@@ -10,7 +10,7 @@ local function assertStringsMatch(base: string, expected: string)
 		table.insert(baseLines, line)
 	end
 
-	local expectedLines = {}
+	local expectedLines: { string } = {}
 	for line in expected:gmatch("[^\r\n]+") do
 		table.insert(expectedLines, line)
 	end

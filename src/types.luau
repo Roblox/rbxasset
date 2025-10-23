@@ -1,4 +1,4 @@
-local t = require("@pkg/t")
+local t: any = require("@pkg/t")
 
 local types = {}
 
@@ -155,5 +155,21 @@ export type OperationResponse = {
 		},
 	}?,
 } & ErrorStatusResponse
+
+export type LuauTaskResponse = {
+	binaryInput: string,
+	binaryOutputUri: string,
+	createTime: string,
+	enableBinaryOutput: boolean,
+	output: {
+		results: { any },
+	},
+	path: string,
+	script: string,
+	state: string,
+	updateTime: string,
+	user: string,
+	error: { [string]: any }?,
+}
 
 return types

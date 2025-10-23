@@ -47,8 +47,8 @@ local function runLuauTask(
 	local placePath = buildLuauExecutionRobloxPlace(TEMP_DIR)
 
 	if runnerContext.modelPath then
-		local game = roblox.deserializePlace(fs.readfiletostringtostring(placePath))
-		local root = roblox.deserializeModel(fs.readfiletostringtostring(runnerContext.modelPath))
+		local game = roblox.deserializePlace(fs.readfiletostring(placePath))
+		local root = roblox.deserializeModel(fs.readfiletostring(runnerContext.modelPath))
 		for _, child in root do
 			child.Parent = game:GetService("ReplicatedStorage")
 			logging.debug(`parented {child} to ReplicatedStorage`)

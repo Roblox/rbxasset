@@ -33,7 +33,8 @@ local function setAssetDetailsAsync(assetId: string, apiKey: string, details: As
 		body = formData.body,
 	})
 
-	local body: OperationResponse = json.deserialize(res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local body: OperationResponse = json.deserialize(res.body) :: any
 
 	if body.message then
 		error(body.message)

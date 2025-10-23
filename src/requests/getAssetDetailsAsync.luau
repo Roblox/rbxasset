@@ -11,7 +11,10 @@ local function getAssetDetailsAsync(assetId: string, apiKey: string)
 		},
 	})
 
-	return json.deserialize(res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local assetDetails: any = json.deserialize(res.body)
+
+	return assetDetails
 end
 
 return getAssetDetailsAsync

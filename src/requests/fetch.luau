@@ -29,9 +29,10 @@ local function fetch(url: string, options: FetchOptions)
 	else
 		-- TODO: This block might need to be revised to work with Lute
 
-		local body = json.deserialize(res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+		local body: any = json.deserialize(res.body)
 
-		local problems = {}
+		local problems: { string } = {}
 		if body.errors then
 			for _, err in body.errors do
 				table.insert(problems, err.message)

@@ -55,7 +55,8 @@ local function setAssetIconAsync(projectPath: string, assetName: string, assetCo
 		body = formData.body,
 	})
 
-	local body = json.deserialize(res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local body: any = json.deserialize(res.body)
 
 	if not body.operationId then
 		logging.err(`failed to set asset icon`)
