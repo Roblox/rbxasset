@@ -1,6 +1,6 @@
 local rbxasset = require("@root/")
 
-local process = require("@lune/process")
+local process = require("@lute/process")
 
 local apiKey = process.args[1]
 assert(apiKey, "argument #1 must be a valid Open Cloud API key")

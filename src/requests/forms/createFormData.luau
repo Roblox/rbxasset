@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 type FormField = {
 	value: any,
@@ -10,7 +10,7 @@ local function createFormDataBody(boundary: string, data: { [string]: FormField 
 	local body = {}
 
 	for key, field in data do
-		local value = if field.contentType == "application/json" then serde.encode("json", field.value) else field.value
+		local value = if field.contentType == "application/json" then json.serialize(field.value) else field.value
 
 		local lines = {
 			`--{boundary}`,

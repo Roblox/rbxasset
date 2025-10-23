@@ -1,5 +1,5 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local json = require("@lute/std/json")
 
 local fetch = require("@root/requests/fetch")
 local logging = require("@root/logging")
@@ -21,7 +21,7 @@ local function publishPlaceAsync(
 	local res =
 		fetch(`https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType={versionType}`, {
 			method = "POST",
-			body = fs.readFile(placePath),
+			body = fs.readfiletostringtostring(placePath),
 			headers = {
 				["x-api-key"] = apiKey,
 				["Content-Type"] = "application/xml",
@@ -30,7 +30,7 @@ local function publishPlaceAsync(
 		})
 
 	if res.ok then
-		local body = serde.decode("json", res.body)
+		local body = json.deserialize(res.body)
 		return body.versionNumber :: number
 	end
 	return -1

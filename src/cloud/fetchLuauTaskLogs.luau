@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 local fetch = require("@root/requests/fetch")
 
@@ -9,7 +9,7 @@ local function fetchLuauTaskLogs(taskPath: string, apiKey: string): { string }
 		},
 	})
 
-	local logs = serde.decode("json", res.body)
+	local logs = json.deserialize(res.body)
 
 	if #logs["luauExecutionSessionTaskLogs"] == 0 then
 		return {} -- no logs found

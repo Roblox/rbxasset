@@ -1,4 +1,4 @@
-local fs = require("@lune/fs")
+local fs = require("@lute/fs")
 
 local run = require("@root/lib/run")
 
@@ -21,7 +21,7 @@ run("rm", { "-rf", BUILD_PATH })
 run("mkdir", { "-p", ARTIFACT_PATH })
 
 for _, includeName in INCLUDES do
-	if fs.isDir(includeName) then
+	if fs.type(includeName) == "dir" then
 		run("cp", { "-R", includeName, `{ARTIFACT_PATH}/{includeName}` })
 	else
 		run("cp", { includeName, ARTIFACT_PATH })

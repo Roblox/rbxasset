@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -33,7 +33,7 @@ local function setAssetDetailsAsync(assetId: string, apiKey: string, details: As
 		body = formData.body,
 	})
 
-	local body: OperationResponse = serde.decode("json", res.body)
+	local body: OperationResponse = json.deserialize(res.body)
 
 	if body.message then
 		error(body.message)

@@ -1,5 +1,5 @@
-local net = require("@lune/net")
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
+local net = require("@lute/net")
 
 local logging = require("@root/logging")
 
@@ -16,9 +16,10 @@ local function fetch(url: string, options: FetchOptions)
 
 	logging.debug(`{method} {url}`)
 
-	local res = net.request({
-		url = url,
-		method = method,
+	net.request(url)
+
+	local res = net.request(url, {
+		method = method :: string,
 		headers = options.headers,
 		body = options.body,
 	})
@@ -26,7 +27,9 @@ local function fetch(url: string, options: FetchOptions)
 	if res.ok then
 		return res
 	else
-		local body = serde.decode("json", res.body)
+		-- TODO: This block might need to be revised to work with Lute
+
+		local body = json.deserialize(res.body)
 
 		local problems = {}
 		if body.errors then
@@ -36,7 +39,7 @@ local function fetch(url: string, options: FetchOptions)
 		end
 
 		error(
-			`{res.statusCode} {res.statusMessage} when attempting to {method} {url}`
+			`{res.status} {res.body} when attempting to {method} {url}`
 				.. if #problems > 0 then `: {table.concat(problems, ", ")}` else "",
 			2
 		)

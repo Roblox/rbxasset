@@ -1,5 +1,5 @@
-local serde = require("@lune/serde")
-local task = require("@lune/task")
+local json = require("@lute/std/json")
+local task = require("@lute/task")
 
 local fetch = require("@root/requests/fetch")
 
@@ -11,7 +11,7 @@ local function waitForTaskCompletion(operationPath: string, apiKey: string)
 			},
 		})
 
-		local luauTask = serde.decode("json", res.body)
+		local luauTask = json.deserialize(res.body)
 
 		if luauTask.state ~= "PROCESSING" then
 			return luauTask

@@ -1,24 +1,26 @@
-local process = require("@lune/process")
+local process = require("@lute/process")
 
 local logging = require("@root/logging")
 
 type Options = {
 	cwd: string?,
-	env: { [string]: any }?,
+	env: { [string]: string }?,
 }
 
 local function run(program: string, params: { string }, options: Options?): string
-	logging.debug(`RUN > {program} {table.concat(params, " ")}`)
+	local command = `{program} {table.concat(params, " ")}`
+	logging.debug(`RUN > {command}`)
 
-	local result = process.exec(program, params, {
+	local result = process.run(command, {
 		stdio = "inherit",
 		shell = true,
 		cwd = if options then options.cwd else nil,
 		env = if options then options.env else nil,
 	})
 
-	if result.code == 0 then
-		return result.stdout:gsub("\n$", "")
+	if result.ok then
+		local message = result.stdout:gsub("\n$", "")
+		return message
 	else
 		error(result.stderr)
 	end

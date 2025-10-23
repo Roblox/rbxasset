@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -55,7 +55,7 @@ local function setAssetIconAsync(projectPath: string, assetName: string, assetCo
 		body = formData.body,
 	})
 
-	local body = serde.decode("json", res.body)
+	local body = json.deserialize(res.body)
 
 	if not body.operationId then
 		logging.err(`failed to set asset icon`)

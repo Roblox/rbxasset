@@ -1,5 +1,4 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
 
 local createImageAsync = require("@root/requests/createImageAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
@@ -33,7 +32,7 @@ local function publishImagesAsync(
 
 		logging.info(`syncing package icon at {iconPath}`)
 
-		local iconHash = serde.hash("sha256", fs.readFile(iconPath))
+		local iconHash = serde.hash("sha256", fs.readfiletostring(iconPath))
 
 		if existingImages and existingImages[icon] and existingImages[icon].hash == iconHash then
 			logging.debug(`hashes match for {iconPath}, skipping...`)
@@ -70,7 +69,7 @@ local function publishImagesAsync(
 
 		for index, thumbnailFilename in thumbnails do
 			local thumbnailPath = `{projectPath}/{thumbnailFilename}`
-			local thumbnailHash = serde.hash("sha256", fs.readFile(thumbnailPath))
+			local thumbnailHash = serde.hash("sha256", fs.readfiletostring(thumbnailPath))
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
 			if existingThumbnail and existingThumbnail.hash == thumbnailHash then
@@ -113,7 +112,7 @@ local function publishImagesAsync(
 		for _, pendingImage in pendingImages do
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,
-				hash = serde.hash("sha256", fs.readFile(pendingImage.path)),
+				hash = serde.hash("sha256", fs.readfiletostring(pendingImage.path)),
 			}
 
 			logging.debug(

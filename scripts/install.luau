@@ -1,32 +1,52 @@
-local fs = require("@lune/fs")
+local fs = require("@lute/fs")
 
 local run = require("@root/lib/run")
 
-local packages = "pkg"
-local packageIndex = "_Index"
+local PACKAGES_PATH = "pkg"
+local PACKAGE_INDEX_NAME = "_Index"
 
-local repos = {
-	{ git = "itsfrank/frktest@31770327", main = "src" },
-	{ git = "osyrisrblx/t@1dbfccc1", main = "lib" },
-}
+local function installGitDependencies()
+	local repos = {
+		{ git = "itsfrank/frktest@31770327", main = "src" },
+		{ git = "osyrisrblx/t@1dbfccc1", main = "lib" },
+	}
 
-run("rm", { "-rf", packages })
+	for _, repo in repos do
+		local parts = repo.git:split("@")
+		local repoPath = parts[1]
+		local rev = parts[2]
 
-for _, repo in repos do
-	local parts = repo.git:split("@")
-	local repoPath = parts[1]
-	local rev = parts[2]
+		local repoParts = repoPath:split("/")
+		local projectName = repoParts[2]
+		local dest = `{PACKAGES_PATH}/{PACKAGE_INDEX_NAME}/{projectName}`
 
-	local repoParts = repoPath:split("/")
-	local projectName = repoParts[2]
-	local dest = `{packages}/{packageIndex}/{projectName}`
+		run("git", { "clone", `https://github.com/{repoPath}`, dest })
 
-	run("git", { "clone", `https://github.com/{repoPath}`, dest })
+		run("git", { "reset", "--hard", rev }, {
+			cwd = dest,
+		})
 
-	run("git", { "reset", "--hard", rev }, {
-		cwd = dest,
-	})
-
-	local linkerPath = `{packages}/{projectName}.luau`
-	fs.writeFile(linkerPath, `return require("./{packageIndex}/{projectName}/{repo.main}")`)
+		local linkerPath = `{PACKAGES_PATH}/{projectName}.luau`
+		fs.writestringtofile(linkerPath, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
+	end
 end
+
+local function installLuteBatteries()
+	local commit = "7b4e269"
+	local batteries = {
+		"cli.luau",
+		"toml.luau",
+	}
+
+	run("mkdir", { "-p", PACKAGES_PATH })
+	for _, battery in batteries do
+		run("curl", { "-LO", `https://raw.githubusercontent.com/luau-lang/lute/{commit}/batteries/{battery}` }, {
+			cwd = PACKAGES_PATH,
+		})
+	end
+end
+
+run("rm", { "-rf", PACKAGES_PATH })
+
+installGitDependencies()
+installLuteBatteries()

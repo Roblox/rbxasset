@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 local fetch = require("@root/requests/fetch")
 local types = require("@root/types")
@@ -34,12 +34,12 @@ local function createLuauTask(
 				["Content-Type"] = "application/json",
 				["x-api-key"] = apiKey,
 			},
-			body = serde.encode("json", {
+			body = json.serialize({
 				["script"] = scriptContent,
 			}),
 		})
 
-	return serde.decode("json", res.body)
+	return json.deserialize(res.body)
 end
 
 return createLuauTask

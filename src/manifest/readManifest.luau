@@ -1,5 +1,5 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local toml = require("@pkg/toml")
 
 local constants = require("@root/constants")
 local logging = require("@root/logging")
@@ -11,11 +11,11 @@ local function readManifest(packagePath: string): Manifest
 	local manifestPath = `{packagePath}/{constants.ASSET_MANIFEST_FILENAME}`
 	local content: string
 	local success, err = pcall(function()
-		content = fs.readFile(manifestPath)
+		content = fs.readfiletostring(manifestPath)
 	end)
 	assert(success, `failed to read asset manifest at {manifestPath}: {err}`)
 
-	local parsedContent = serde.decode("toml", content)
+	local parsedContent = toml.deserialize(content)
 
 	local isManifestValid, message = types.validateManifest(parsedContent)
 	assert(isManifestValid, `failed to parse asset manifest at {manifestPath}: {message}`)

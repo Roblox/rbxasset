@@ -1,5 +1,5 @@
-local process = require("@lune/process")
-local stdio = require("@lune/stdio")
+local process = require("@lute/process")
+-- local stdio = require("@lute/stdio")
 
 type LogLevel = "info" | "warn" | "err" | "debug"
 
@@ -33,25 +33,25 @@ end
 
 function logging.warn(...)
 	if canLog("warn") then
-		stdio.write(stdio.color("yellow"))
+		-- stdio.write(stdio.color("yellow"))
 		print(`[warn]`, ...)
-		stdio.write(stdio.color("reset"))
+		-- stdio.write(stdio.color("reset"))
 	end
 end
 
 function logging.err(...)
 	if canLog("err") then
-		stdio.write(stdio.color("red"))
+		-- stdio.write(stdio.color("red"))
 		print(`[err]`, ...)
-		stdio.write(stdio.color("reset"))
+		-- stdio.write(stdio.color("reset"))
 	end
 end
 
 function logging.debug(...)
 	if canLog("debug") then
-		stdio.write(stdio.color("black"))
+		-- stdio.write(stdio.color("black"))
 		print(`[debug]`, ...)
-		stdio.write(stdio.color("reset"))
+		-- stdio.write(stdio.color("reset"))
 	end
 end
 

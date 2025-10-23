@@ -1,5 +1,5 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local json = require("@lute/std/json")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -29,7 +29,7 @@ local function createImageAsync(
 		},
 		fileContent = {
 			filename = imagePath:match("[/\\](.+)$"),
-			value = fs.readFile(imagePath),
+			value = fs.readfiletostring(imagePath),
 			contentType = "image/png",
 		},
 	})
@@ -43,7 +43,7 @@ local function createImageAsync(
 		body = formData.body,
 	})
 
-	local body = serde.decode("json", res.body)
+	local body = json.deserialize(res.body)
 
 	return waitForAssetOperationAsync(body.operationId, apiKey)
 end

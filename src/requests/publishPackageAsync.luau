@@ -1,4 +1,4 @@
-local process = require("@lune/process")
+-- local process = require("@lute/process")
 
 local logging = require("@root/logging")
 local publishAssetAsync = require("@root/requests/publishAssetAsync")
@@ -12,7 +12,8 @@ local function publishPackageAsync(projectPath: string, assetName: string, apiKe
 	local asset = manifest.assets[assetName]
 	if not asset then
 		logging.err(`publishing failed, could not find an asset named {assetName} in the manifest`)
-		process.exit(1)
+		-- process.exit(1)
+		error(1)
 	end
 
 	local environment = manifest.environments[asset.environment]

@@ -1,5 +1,5 @@
-local serde = require("@lune/serde")
-local task = require("@lune/task")
+local json = require("@lute/std/json")
+local task = require("@lute/task")
 
 local fetch = require("@root/requests/fetch")
 local types = require("@root/types")
@@ -21,7 +21,7 @@ local function waitForAssetOperationAsync(operationId: string, apiKey: string): 
 			},
 		})
 
-		local body = serde.decode("json", res.body)
+		local body = json.deserialize(res.body)
 
 		if res.ok and body.done then
 			return body

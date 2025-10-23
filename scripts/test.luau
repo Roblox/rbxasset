@@ -1,4 +1,4 @@
-local process = require("@lune/process")
+-- local process = require("@lute/process")
 
 local frktest = require("@pkg/frktest")
 
@@ -25,4 +25,5 @@ loadTestCases()
 reporter.init()
 local success = frktest.run()
 
-process.exit(if success then 0 else 1)
+-- process.exit(if success then 0 else 1)
+assert(success, "one or more unit tests failed")

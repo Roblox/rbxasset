@@ -1,5 +1,5 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local toml = require("@pkg/toml")
 
 local constants = require("@root/constants")
 local join = require("@root/lib/join")
@@ -15,10 +15,10 @@ local function getOrCreateAssetLockfile(packagePath: string): Lockfile
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		content = fs.readFile(lockfilePath)
+		content = fs.readfiletostring(lockfilePath)
 	end)
 
-	local parsedLockfile = if success then serde.decode("toml", content) else nil
+	local parsedLockfile = if success then toml.deserialize(content) else nil
 	local lockfile: Lockfile = join({
 		assets = {},
 		images = {},

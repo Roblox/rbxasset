@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@lute/std/json")
 
 local logging = require("@root/logging")
 local types = require("@root/types")
@@ -56,12 +56,12 @@ local function executeLuauTask(
 
 		if output["results"] then
 			logging.info("task output:")
-			logging.info(serde.encode("json", output["results"], true))
+			logging.info(json.serialize(output["results"], true))
 		else
 			logging.info("the task did not return any results")
 		end
 	else
-		logging.err(`Task failed, error:\n{serde.encode("json", luauTask.error)}`)
+		logging.err(`Task failed, error:\n{json.serialize(luauTask.error)}`)
 	end
 
 	return variables

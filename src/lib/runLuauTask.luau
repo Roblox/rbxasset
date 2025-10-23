@@ -1,6 +1,5 @@
-local fs = require("@lune/fs")
-local roblox = require("@lune/roblox")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local json = require("@lute/std/json")
 
 local executeLuauTask = require("@root/cloud/executeLuauTask")
 local logging = require("@root/logging")
@@ -20,7 +19,7 @@ local function buildLuauExecutionRobloxPlace(outputPath: string): string
 		},
 	}
 
-	fs.writeFile(rojoProjectPath, serde.encode("json", rojoProject))
+	fs.writestringtofile(rojoProjectPath, json.serialize(rojoProject))
 
 	run("rojo", { "build", rojoProjectPath, "-o", placePath })
 
@@ -41,20 +40,20 @@ local function runLuauTask(
 )
 	run("rm", { "-rf", TEMP_DIR })
 
-	if not fs.isDir(TEMP_DIR) then
-		fs.writeDir(TEMP_DIR)
+	if not fs.exists(TEMP_DIR) then
+		fs.mkdir(TEMP_DIR)
 	end
 
 	local placePath = buildLuauExecutionRobloxPlace(TEMP_DIR)
 
 	if runnerContext.modelPath then
-		local game = roblox.deserializePlace(fs.readFile(placePath))
-		local root = roblox.deserializeModel(fs.readFile(runnerContext.modelPath))
+		local game = roblox.deserializePlace(fs.readfiletostringtostring(placePath))
+		local root = roblox.deserializeModel(fs.readfiletostringtostring(runnerContext.modelPath))
 		for _, child in root do
 			child.Parent = game:GetService("ReplicatedStorage")
 			logging.debug(`parented {child} to ReplicatedStorage`)
 		end
-		fs.writeFile(placePath, roblox.serializePlace(game))
+		fs.writestringtofile(placePath, roblox.serializePlace(game))
 	end
 
 	logging.info("substituting globals", globals)
