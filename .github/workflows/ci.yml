@@ -19,10 +19,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute scripts/install.luau
 
       - name: Run unit tests
-        run: lune run test
+        run: lute scripts/test.luau
 
   code-quality:
     runs-on: ubuntu-latest
@@ -36,10 +36,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute scripts/install.luau
 
       - name: Lint
-        run: lune run lint
+        run: lute scripts/lint.luau
 
   analyze:
     runs-on: ubuntu-latest
@@ -53,12 +53,12 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute scripts/install.luau
 
       - name: Setup Lune typedefs
-        run: lune setup
+        run: lute setup
 
       # MUS-2103 TODO: This will error in CI until Foreman is updated to install
       # the correct linux binary for luau-lsp
       - name: Analyze
-        run: lune run analyze
+        run: lute scripts/analyze.luau
