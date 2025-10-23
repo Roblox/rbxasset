@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-standalone-zip:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 10
     env:
       BUILD_ARTIFACT_PATH: build/rbxasset.zip
