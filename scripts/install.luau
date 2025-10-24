@@ -47,5 +47,8 @@ end
 
 run("rm", { "-rf", PACKAGES_PATH })
 
+-- Setup typedefs for the current Lute version
+run("lute", { "setup" })
+
 installGitDependencies()
 installLuteBatteries()

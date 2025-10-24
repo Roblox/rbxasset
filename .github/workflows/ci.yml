@@ -55,9 +55,6 @@ jobs:
       - name: Install dependencies
         run: lute scripts/install.luau
 
-      - name: Setup Lune typedefs
-        run: lute setup
-
       # MUS-2103 TODO: This will error in CI until Foreman is updated to install
       # the correct linux binary for luau-lsp
       - name: Analyze
