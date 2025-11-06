@@ -1,28 +1,32 @@
 local process = require("@lute/process")
 
-local logging = require("@root/logging")
-
 type Options = {
 	cwd: string?,
 	env: { [string]: string }?,
+	stdio: any,
 }
 
 local function run(program: string, params: { string }, options: Options?): string
 	local command = `{program} {table.concat(params, " ")}`
-	logging.debug(`RUN > {command}`)
+	-- stdio.write(stdio.style("bold"))
+	print(`> {command}`)
+	-- stdio.write(stdio.style("reset"))
 
-	local result = process.run(command, {
-		stdio = "inherit",
+	local result = process.run({
+		program,
+		table.unpack(params),
+	}, {
 		shell = true,
+		stdio = if options and options.stdio then options.stdio else nil,
 		cwd = if options then options.cwd else nil,
 		env = if options then options.env else nil,
 	})
 
 	if result.ok then
-		local message = result.stdout:gsub("\n$", "")
-		return message
+		local trimmed = result.stdout:gsub("^\n", ""):gsub("\n$", "")
+		return trimmed
 	else
-		error(result.stderr)
+		error(result.stderr, 2)
 	end
 end
 
