@@ -19,10 +19,10 @@ local function getOrCreateAssetLockfile(packagePath: string): Lockfile
 	end)
 
 	local parsedLockfile = if success then toml.deserialize(content) else nil
-	local lockfile: Lockfile = join({
+	local lockfile = join({
 		assets = {},
 		images = {},
-	}, parsedLockfile)
+	}, parsedLockfile) :: Lockfile
 
 	local isLockfileValid, message = types.validateLockfile(lockfile)
 	assert(isLockfileValid, `failed to parse asset lockfile at {lockfilePath}: {message}`)

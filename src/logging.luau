@@ -3,8 +3,6 @@ local process = require("@lute/process")
 
 type LogLevel = "info" | "warn" | "err" | "debug"
 
-local LOG_LEVEL = if process.env.LOG_LEVEL then process.env.LOG_LEVEL:lower() else "info"
-
 local LOG_LEVEL_ORDER = {
 	"err",
 	"info",
@@ -12,8 +10,17 @@ local LOG_LEVEL_ORDER = {
 	"debug",
 }
 
+local function getLogLevel(): LogLevel
+	local logLevel = process.env.LOG_LEVEL
+	if logLevel and logLevel ~= "" then
+		return logLevel:lower() :: LogLevel
+	else
+		return "info"
+	end
+end
+
 local function canLog(logLevelToCheck: LogLevel): boolean
-	local maxPriority = table.find(LOG_LEVEL_ORDER, LOG_LEVEL)
+	local maxPriority = table.find(LOG_LEVEL_ORDER, getLogLevel())
 	local priorityToCheck = table.find(LOG_LEVEL_ORDER, logLevelToCheck)
 
 	if maxPriority and priorityToCheck then

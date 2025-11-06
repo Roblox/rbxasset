@@ -30,11 +30,10 @@ local function publishPlaceAsync(
 		})
 
 	if res.ok then
-		-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
-		local body: any = json.deserialize(res.body)
+		local body = json.deserialize(res.body)
 
 		if typeof(body) == "table" and next(body) ~= nil then
-			return body.versionNumber :: number
+			return (body :: any).versionNumber :: number
 		end
 	end
 	return -1

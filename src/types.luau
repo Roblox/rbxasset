@@ -79,11 +79,11 @@ types.validateManifest = function(value: any): (boolean, string?)
 		return success, message
 	end
 
-	if typeof(value.assets) == "table" and countObject(value.assets) == 0 then
+	if typeof(value.assets) == "table" and countObject(value.assets :: { [any]: any }) == 0 then
 		return false, "at least one asset must be defined in the manifest"
 	end
 
-	if typeof(value.environments) == "table" and countObject(value.environments) == 0 then
+	if typeof(value.environments) == "table" and countObject(value.environments :: { [any]: any }) == 0 then
 		return false, "at least one environment must be defined in the manifest"
 	end
 
