@@ -31,7 +31,7 @@ local function installGitDependencies()
 end
 
 local function installLuteBatteries()
-	local commit = "7b4e269"
+	local commit = "4c5adb2"
 	local batteries = {
 		"cli.luau",
 		"toml.luau",
