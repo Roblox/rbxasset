@@ -1,4 +1,4 @@
-local assert = require("@std/assert")
+local assert = require("@std/test/assert")
 local test = require("@std/test")
 
 local createFormData = require("./createFormData")

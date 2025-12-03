@@ -1,13 +1,10 @@
-local assert = require("@std/assert")
+local assert = require("@std/test/assert")
 local test = require("@std/test")
 
 local types = require("./types")
 
--- FIXME: The `assert` arg to `case` resolves to an error type right now so
--- we're requiring `@std/assert` manually
-
-test.suite("validateManifest", function(suite)
-	suite:case("accepts minimal manifest", function(_assert)
+test.suite("validateManifest", function()
+	test.case("accepts minimal manifest", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -29,7 +26,7 @@ test.suite("validateManifest", function(suite)
 		assert.eq(success, true)
 	end)
 
-	suite:case("accepts optional manifest values", function()
+	test.case("accepts optional manifest values", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -54,7 +51,7 @@ test.suite("validateManifest", function(suite)
 		assert.eq(success, true)
 	end)
 
-	suite:case("denies empty assets object", function()
+	test.case("denies empty assets object", function()
 		local success, message = types.validateManifest({
 			assets = {},
 			environments = {
@@ -71,7 +68,7 @@ test.suite("validateManifest", function(suite)
 		assert.eq(message, "at least one asset must be defined in the manifest")
 	end)
 
-	suite:case("denies empty environments object", function()
+	test.case("denies empty environments object", function()
 		local success, message = types.validateManifest({
 			assets = {
 				main = {
@@ -90,7 +87,7 @@ test.suite("validateManifest", function(suite)
 		assert.eq(message, "at least one environment must be defined in the manifest")
 	end)
 
-	suite:case("assets must map back to a valid environment", function()
+	test.case("assets must map back to a valid environment", function()
 		local success, message = types.validateManifest({
 			assets = {
 				main = {
@@ -116,7 +113,7 @@ test.suite("validateManifest", function(suite)
 		assert.eq(message, `asset "main" attempts to use the environment "does-not-exist" which does not exist`)
 	end)
 
-	suite:case("denies optional manifest values of the wrong type", function()
+	test.case("denies optional manifest values of the wrong type", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -140,13 +137,13 @@ test.suite("validateManifest", function(suite)
 		assert.eq(success, false)
 	end)
 
-	suite:case("denies empty object", function()
+	test.case("denies empty object", function()
 		local success = types.validateManifest({})
 
 		assert.eq(success, false)
 	end)
 
-	suite:case("denies invalid types", function()
+	test.case("denies invalid types", function()
 		local success = types.validateManifest({
 			assets = {
 				main = {
@@ -169,8 +166,8 @@ test.suite("validateManifest", function(suite)
 	end)
 end)
 
-test.suite("validateLockfile", function(suite)
-	suite:case("must have an assetId", function()
+test.suite("validateLockfile", function()
+	test.case("must have an assetId", function()
 		local success = types.validateLockfile({
 			assets = {
 				foo = {
@@ -183,7 +180,7 @@ test.suite("validateLockfile", function(suite)
 		assert.eq(success, true)
 	end)
 
-	suite:case("handles storing images", function()
+	test.case("handles storing images", function()
 		local success = types.validateLockfile({
 			assets = {
 				foo = {
@@ -201,7 +198,7 @@ test.suite("validateLockfile", function(suite)
 		assert.eq(success, true)
 	end)
 
-	suite:case("denies empty object", function()
+	test.case("denies empty object", function()
 		local success = types.validateLockfile({})
 
 		assert.eq(success, false)
