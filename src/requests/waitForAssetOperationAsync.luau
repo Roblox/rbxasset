@@ -5,7 +5,7 @@ local fetch = require("@root/requests/fetch")
 local types = require("@root/types")
 
 local MAX_RETRIES = 5
-local RETRY_MULTIPLIER = 2
+local RETRY_MULTIPLIER = 1
 
 type OperationResponse = types.OperationResponse
 
@@ -27,10 +27,12 @@ local function waitForAssetOperationAsync(operationId: string, apiKey: string): 
 			return body
 		else
 			task.wait(retryPollingDelay)
+			currentRetries += 1
 			retryPollingDelay *= RETRY_MULTIPLIER
 		end
 	end
-	error(`operation "{operationId}" did not complete within {MAX_RETRIES} attempts`)
+
+	error(`operation {operationId} did not complete within {MAX_RETRIES} attempts`)
 end
 
 return waitForAssetOperationAsync

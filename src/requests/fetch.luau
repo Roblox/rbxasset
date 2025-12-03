@@ -33,6 +33,8 @@ local function fetch(url: string, options: FetchOptions)
 			for _, err in body.errors do
 				table.insert(problems, err.message)
 			end
+		elseif body.message then
+			table.insert(problems, body.message)
 		end
 
 		error(

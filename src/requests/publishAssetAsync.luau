@@ -1,10 +1,14 @@
+local fs = require("@lune/fs")
+local serde = require("@lune/serde")
+
+local createFormData = require("@root/requests/forms/createFormData")
+local fetch = require("@root/requests/fetch")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local join = require("@root/lib/join")
-local publishAssetTask = require("@root/tasks/publishAsset")
-local runLuauTask = require("@root/lib/runLuauTask")
 local setAssetDetailsAsync = require("@root/requests/setAssetDetailsAsync")
 local types = require("@root/types")
+local waitForAssetOperationAsync = require("@root/requests/waitForAssetOperationAsync")
 local writeLockfile = require("@root/manifest/writeLockfile")
 
 type AssetConfig = types.AssetConfig
@@ -25,28 +29,46 @@ local function publishAssetAsync(
 	local existingAssetId = if existingAsset then existingAsset.assetId else nil
 	local assetDetails = if existingAssetId then getAssetDetailsAsync(existingAssetId, apiKey) else nil
 
-	local variables = runLuauTask(publishAssetTask, {
-		CREATOR_ID = environment.creatorId,
-		CREATOR_TYPE = environment.creatorType,
-		ASSET_TYPE = asset.type or "Package",
+	local creatorIdKey = if environment.creatorType == "User" then "userId" else "groupId"
 
-		-- Only provide the assetId from the lockfile if there's a matching
-		-- asset on the Creator Store. We need this check in case the lockfile
-		-- is edited manually to a nonexistent id
-		ASSET_ID = if assetDetails and assetDetails.assetId then existingAssetId else nil :: any,
-	}, {
-		universeId = environment.universeId,
-		placeId = environment.placeId,
-		modelPath = asset.model,
-		apiKey = apiKey,
+	local formData = createFormData({
+		request = {
+			value = {
+				assetType = "Model", -- TODO: Allow for publishing Plugins
+				displayName = asset.name,
+				creationContext = {
+					creator = {
+						[creatorIdKey] = environment.creatorId,
+					},
+				},
+			},
+			contentType = "application/json",
+		},
+		fileContent = {
+			filename = asset.model,
+			value = fs.readFile(asset.model),
+			contentType = "model/x-rbxm",
+		},
 	})
 
-	local assetId = if variables then variables.ASSET_ID else nil
+	-- TODO: This will always upload a new asset. Next we need to account for
+	-- updating the existing one in the lockfile
+	local res = fetch("https://apis.roblox.com/assets/v1/assets", {
+		method = "POST",
+		headers = {
+			["x-api-key"] = apiKey,
+			["Content-Type"] = `multipart/form-data; boundary={formData.boundary}`,
+		},
+		body = formData.body,
+	})
+
+	local body = serde.decode("json", res.body)
+
+	local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
+
+	local assetId = if operationRes and operationRes.response then operationRes.response.assetId else nil
 
 	if assetId then
-		-- CreateAssetAsync and CreateAssetVersionAsync in the Luau task
-		-- don't actually update the asset's name/description, so we need to
-		-- handle that manually.
 		setAssetDetailsAsync(assetId, apiKey, {
 			displayName = asset.name,
 			description = asset.description,
