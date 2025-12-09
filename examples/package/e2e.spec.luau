@@ -63,11 +63,9 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	-- Revision ID should be the same since we aren't changing the source code
-	check.equal(assetDetails.revisionId, prevRevisionId)
-
 	check.equal(assetDetails.displayName, manifest.assets.package.name)
 	check.equal(assetDetails.description, manifest.assets.package.description)
+	check.not_equal(assetDetails.revisionId, prevRevisionId)
 end)
 
 test.case("does not publish a new version when there are no changes", function()
