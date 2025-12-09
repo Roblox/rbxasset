@@ -1,14 +1,17 @@
 local frktest = require("@pkg/frktest")
 local fs = require("@lune/fs")
 local process = require("@lune/process")
+local serde = require("@lune/serde")
 
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
+local readManifest = require("@root/manifest/readManifest")
 
 local test = frktest.test
 local check = frktest.assert.check
 
 local ROOT_PATH = "examples/package"
+local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
 
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
@@ -20,12 +23,9 @@ process.exec("rojo", { "build", "-o", "asset.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
-test.case("uploads to the Creator Store", function()
+test.case("uploads rbxm to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
-
 	local prevRevisionId = assetDetails.revisionId
-
-	print("assetDetails", assetDetails)
 
 	local path = `{ROOT_PATH}/src/init.luau`
 	local content = fs.readFile(path)
@@ -36,14 +36,38 @@ test.case("uploads to the Creator Store", function()
 		cwd = ROOT_PATH,
 	})
 
-	-- TODO: This should be run after each test
-	process.exec("git", { "restore", ROOT_PATH })
+	process.exec("git", { "restore", path })
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	print("assetDetails", assetDetails)
-
 	check.not_equal(assetDetails.revisionId, prevRevisionId)
+end)
+
+test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
+	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
+	local prevRevisionId = assetDetails.revisionId
+
+	local manifest = readManifest(ROOT_PATH)
+
+	local id = math.random(1, 1e10)
+	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
+	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
+
+	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
+
+	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+		cwd = ROOT_PATH,
+	})
+
+	process.exec("git", { "restore", MANIFEST_PATH })
+
+	assetDetails = getAssetDetailsAsync(assetId, apiKey)
+
+	-- Revision ID should be the same since we aren't changing the source code
+	check.equal(assetDetails.revisionId, prevRevisionId)
+
+	check.equal(assetDetails.displayName, manifest.assets.package.name)
+	check.equal(assetDetails.description, manifest.assets.package.description)
 end)
 
 test.case("does not publish a new version when there are no changes", function()
