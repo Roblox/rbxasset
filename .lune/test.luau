@@ -20,10 +20,7 @@ local function loadTestCases(path: string, alias: string)
 	end
 end
 
-print("Unit tests:")
 loadTestCases("src", "@root")
-
-print("Integration tests:")
 loadTestCases("examples", "@examples")
 
 reporter.init()
