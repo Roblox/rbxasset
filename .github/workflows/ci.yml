@@ -23,6 +23,8 @@ jobs:
 
       - name: Run unit tests
         run: lune run test
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
 
   code-quality:
     runs-on: ubuntu-latest
