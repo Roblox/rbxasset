@@ -81,7 +81,3 @@ test.case("does not publish a new version when there are no changes", function()
 
 	check.equal(assetDetails.revisionId, prevRevisionId)
 end)
-
--- Use rbxcloud or build out some Open Cloud luau scripts to handle all the
--- validation. It would likely be fastest to use rbxcloud, but more
--- beneficial longterm to write everything in Luau
