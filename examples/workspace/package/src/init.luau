@@ -1,5 +1,1 @@
-return {
-	hello = function()
-		print("Hello, World!")
-	end,
-}
+print("This is a Package!")
