@@ -7,9 +7,9 @@ local run = require("@root/lib/run")
 
 local reporter = frktest._reporters.lune_console_reporter
 
-local function loadTestCases()
-	local output = run("find", { "src", "-iname", "*.spec.luau" })
-	output = output:gsub("src/", "@root/")
+local function loadTestCases(path: string, alias: string)
+	local output = run("find", { path, "-iname", "*.spec.luau" })
+	output = output:gsub(path, alias)
 
 	local files = output:split("\n")
 
@@ -20,7 +20,11 @@ local function loadTestCases()
 	end
 end
 
-loadTestCases()
+print("Unit tests:")
+loadTestCases("src", "@root")
+
+print("Integration tests:")
+loadTestCases("examples", "@examples")
 
 reporter.init()
 local success = frktest.run()
