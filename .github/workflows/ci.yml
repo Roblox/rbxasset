@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: lune run install
 
-      - name: Run unit tests
+      - name: Run end-to-end tests
         run: lune run test-e2e
         env:
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
