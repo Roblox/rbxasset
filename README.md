@@ -126,7 +126,6 @@ Assets define how the asset will be deployed and shown on the Creator Store.
 | `environment` | `string`                | Defines which environment to deploy to. This value must equal one of the environments defined in the `environments` object                                    |
 | `description` | `string?`               | The description of the asset on the Creator Store                                                                                                             |
 | `icon`        | `string?`               | Path to the icon (png only) to display on the Creator Store                                                                                                   |
-| `description` | `string?`               | The description of the asset on the Creator Store                                                                                                             |
 | `type`        | `"Package" \| "Plugin"` | The type of asset to upload to the Creator Store. This must be set before the first publish as asset type is immutable once uploaded. Defaults to `"Package"` |
 
 ## Environments
