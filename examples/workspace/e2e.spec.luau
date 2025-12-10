@@ -20,6 +20,12 @@ local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
+local function appendTextForTesting(path: string, text: string)
+	local content = fs.readFile(path)
+	content ..= text
+	fs.writeFile(path, content)
+end
+
 process.exec("rojo", { "build", "-o", "plugin.rbxm" }, {
 	cwd = ROOT_PATH,
 })
@@ -37,9 +43,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 	}
 
 	for _, path in filesToChange do
-		local content = fs.readFile(path)
-		content ..= `\nprint("New!")`
-		fs.writeFile(path, content)
+		appendTextForTesting(path, `\nprint("New!")`)
 	end
 
 	process.exec("lune", { "run", "deploy.luau", apiKey }, {
@@ -57,11 +61,15 @@ end)
 
 test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
 	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	local prevRevisionId = packageAssetDetails.revisionId
+	local pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
 	local manifest = readManifest(ROOT_PATH)
 
 	local id = math.random(1, 1e10)
+
+	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
+	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
+
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
@@ -74,25 +82,36 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	process.exec("git", { "restore", MANIFEST_PATH })
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
+	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
-	check.equal(packageAssetDetails.displayName, manifest.assets.plugin.name)
-	check.equal(packageAssetDetails.description, manifest.assets.plugin.description)
-	check.not_equal(packageAssetDetails.revisionId, prevRevisionId)
+	check.equal(packageAssetDetails.displayName, manifest.assets.package.name)
+	check.equal(packageAssetDetails.description, manifest.assets.package.description)
+
+	check.equal(pluginAssetDetails.displayName, manifest.assets.plugin.name)
+	check.equal(pluginAssetDetails.description, manifest.assets.plugin.description)
 end)
 
 test.case("only publishes a new version for changed workspace members", function()
 	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
+	local pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
-	local prevRevisionId = packageAssetDetails.revisionId
+	local prevPackageRevisionId = packageAssetDetails.revisionId
+	local prevPluginRevisionId = pluginAssetDetails.revisionId
 
-	-- TODO: Make a change to one workspace member, verify that one got a new
-	-- revision but that the other did not
+	-- We make a change to a single workspace member so we can verify that only
+	-- that member was given a new revision after publishing
+	local path = `{ROOT_PATH}/package/src/init.luau`
+	appendTextForTesting(path, `\nprint("New!")`)
 
 	process.exec("lune", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
-	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
+	process.exec("git", { "restore", path })
 
-	check.equal(packageAssetDetails.revisionId, prevRevisionId)
+	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
+	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
+
+	check.not_equal(packageAssetDetails.revisionId, prevPackageRevisionId)
+	check.equal(pluginAssetDetails.revisionId, prevPluginRevisionId)
 end)

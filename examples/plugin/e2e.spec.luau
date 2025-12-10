@@ -13,6 +13,12 @@ local check = frktest.assert.check
 local ROOT_PATH = "examples/plugin"
 local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
 
+local function appendTextForTesting(path: string, text: string)
+	local content = fs.readFile(path)
+	content ..= text
+	fs.writeFile(path, content)
+end
+
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
 
@@ -29,9 +35,7 @@ test.case("uploads to the Creator Store", function()
 	local prevRevisionId = assetDetails.revisionId
 
 	local path = `{ROOT_PATH}/src/init.plugin.luau`
-	local content = fs.readFile(path)
-	content ..= `\nprint("New!")`
-	fs.writeFile(path, content)
+	appendTextForTesting(path, `\nprint("New!")`)
 
 	process.exec("lune", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
