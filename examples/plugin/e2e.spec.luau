@@ -54,7 +54,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 
 	local manifest = readManifest(ROOT_PATH)
 
-	local id = math.random(1, 1e10)
+	local id = os.time()
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
