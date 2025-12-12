@@ -20,7 +20,7 @@ local function loadTestCases(path: string, alias: string)
 	end
 end
 
-loadTestCases("src", "@root")
+loadTestCases("examples", "@examples")
 
 reporter.init()
 local success = frktest.run()
