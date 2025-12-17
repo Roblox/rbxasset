@@ -51,7 +51,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 	end
 
 	local success, result = pcall(function()
-		run("lute", { "run", "deploy.luau", apiKey }, {
+		return run("lute", { "run", "deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -86,7 +86,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		run("lute", { "run", "deploy.luau", apiKey }, {
+		return run("lute", { "run", "deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -118,7 +118,7 @@ test.case("only publishes a new version for changed workspace members", function
 	appendTextForTesting(path, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		run("lute", { "run", "deploy.luau", apiKey }, {
+		return run("lute", { "run", "deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)

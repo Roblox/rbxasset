@@ -40,7 +40,7 @@ test.case("uploads rbxm to the Creator Store", function()
 	appendTextForTesting(path, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		run("lute", { "scripts/deploy.luau", apiKey }, {
+		return run("lute", { "scripts/deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -69,7 +69,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		run("lute", { "scripts/deploy.luau", apiKey }, {
+		return run("lute", { "scripts/deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
