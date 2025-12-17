@@ -1,31 +1,34 @@
-local frktest = require("@pkg/frktest")
-local fs = require("@lune/fs")
-local process = require("@lune/process")
-local serde = require("@lune/serde")
+local expect = require("@std/test/assert")
+local fs = require("@lute/fs")
+local process = require("@lute/process")
+local test = require("@std/test")
+local toml = require("@pkg/toml")
 
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
-
-local test = frktest.test
-local check = frktest.assert.check
+local run = require("@root/lib/run")
 
 local ROOT_PATH = "examples/package"
 local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
 
 local function appendTextForTesting(path: string, text: string)
-	local content = fs.readFile(path)
+	local handle = fs.open(path, "w")
+	local content = fs.read(handle)
 	content ..= text
-	fs.writeFile(path, content)
+	fs.write(handle, content)
+	fs.close(handle)
 end
 
 local apiKey = process.env.ROBLOX_API_KEY
-assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
+if not apiKey then
+	error("End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
+end
 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-process.exec("rojo", { "build", "-o", "asset.rbxm" }, {
+run("rojo", { "build", "-o", "asset.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -36,15 +39,19 @@ test.case("uploads rbxm to the Creator Store", function()
 	local path = `{ROOT_PATH}/src/init.luau`
 	appendTextForTesting(path, `\nprint("New!")`)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lute", { "scripts/deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", path })
+	run("git", { "restore", path })
+
+	assert(success, result)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.not_equal(assetDetails.revisionId, prevRevisionId)
+	expect.neq(assetDetails.revisionId, prevRevisionId)
 end)
 
 test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
@@ -57,19 +64,25 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
-	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
+	local handle = fs.open(MANIFEST_PATH, "w")
+	fs.write(handle, toml.serialize(manifest))
+	fs.close(handle)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lute", { "scripts/deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", MANIFEST_PATH })
+
+	assert(success, result)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.equal(assetDetails.displayName, manifest.assets.package.name)
-	check.equal(assetDetails.description, manifest.assets.package.description)
-	check.not_equal(assetDetails.revisionId, prevRevisionId)
+	expect.eq(assetDetails.displayName, manifest.assets.package.name)
+	expect.eq(assetDetails.description, manifest.assets.package.description)
+	expect.neq(assetDetails.revisionId, prevRevisionId)
 end)
 
 test.case("does not publish a new version when there are no changes", function()
@@ -77,11 +90,11 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+	run("lute", { "scripts/deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.equal(assetDetails.revisionId, prevRevisionId)
+	expect.eq(assetDetails.revisionId, prevRevisionId)
 end)

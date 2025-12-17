@@ -12,11 +12,11 @@ assert(
 	"you must be in the `examples/workspace` folder when running this script"
 )
 
-process.run("rojo build -o ../package.rbxm", {
+process.system("rojo build -o ../package.rbxm", {
 	cwd = "package",
 })
 
-process.run("rojo build -o ../plugin.rbxm", {
+process.system("rojo build -o ../plugin.rbxm", {
 	cwd = "plugin",
 })
 

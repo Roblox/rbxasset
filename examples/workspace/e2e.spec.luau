@@ -1,14 +1,13 @@
-local frktest = require("@pkg/frktest")
-local fs = require("@lune/fs")
-local process = require("@lune/process")
-local serde = require("@lune/serde")
+local expect = require("@std/test/assert")
+local fs = require("@lute/fs")
+local process = require("@lute/process")
+local test = require("@std/test")
+local toml = require("@pkg/toml")
 
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
-
-local test = frktest.test
-local check = frktest.assert.check
+local run = require("@root/lib/run")
 
 local ROOT_PATH = "examples/workspace"
 local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
@@ -21,12 +20,14 @@ local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
 local function appendTextForTesting(path: string, text: string)
-	local content = fs.readFile(path)
+	local handle = fs.open(path, "w")
+	local content = fs.read(handle)
 	content ..= text
-	fs.writeFile(path, content)
+	fs.write(handle, content)
+	fs.close(handle)
 end
 
-process.exec("rojo", { "build", "-o", "plugin.rbxm" }, {
+run("rojo", { "build", "-o", "plugin.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -46,17 +47,21 @@ test.case("uploads each workspace member to the Creator Store", function()
 		appendTextForTesting(path, `\nprint("New!")`)
 	end
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lute", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", table.unpack(filesToChange) })
+	run("git", { "restore", table.unpack(filesToChange) })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
-	check.not_equal(packageAssetDetails.revisionId, prevPackageRevisionId)
-	check.not_equal(pluginAssetDetails.revisionId, prevPluginRevisionId)
+	expect.neq(packageAssetDetails.revisionId, prevPackageRevisionId)
+	expect.neq(pluginAssetDetails.revisionId, prevPluginRevisionId)
 end)
 
 test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
@@ -73,22 +78,24 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
-	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
+	local handle = fs.open(MANIFEST_PATH, "w")
+	fs.write(handle, toml.serialize(manifest))
+	fs.close(handle)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+	run("lute", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
-	process.exec("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", MANIFEST_PATH })
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
-	check.equal(packageAssetDetails.displayName, manifest.assets.package.name)
-	check.equal(packageAssetDetails.description, manifest.assets.package.description)
+	expect.eq(packageAssetDetails.displayName, manifest.assets.package.name)
+	expect.eq(packageAssetDetails.description, manifest.assets.package.description)
 
-	check.equal(pluginAssetDetails.displayName, manifest.assets.plugin.name)
-	check.equal(pluginAssetDetails.description, manifest.assets.plugin.description)
+	expect.eq(pluginAssetDetails.displayName, manifest.assets.plugin.name)
+	expect.eq(pluginAssetDetails.description, manifest.assets.plugin.description)
 end)
 
 test.case("only publishes a new version for changed workspace members", function()
@@ -103,15 +110,15 @@ test.case("only publishes a new version for changed workspace members", function
 	local path = `{ROOT_PATH}/package/src/init.luau`
 	appendTextForTesting(path, `\nprint("New!")`)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+	run("lute", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
-	process.exec("git", { "restore", path })
+	run("git", { "restore", path })
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
 
-	check.not_equal(packageAssetDetails.revisionId, prevPackageRevisionId)
-	check.equal(pluginAssetDetails.revisionId, prevPluginRevisionId)
+	expect.neq(packageAssetDetails.revisionId, prevPackageRevisionId)
+	expect.eq(pluginAssetDetails.revisionId, prevPluginRevisionId)
 end)
