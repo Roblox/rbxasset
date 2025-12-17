@@ -88,6 +88,11 @@ types.validateManifest = function(value: any): (boolean, string?)
 	end
 
 	for key, asset in value.assets do
+		-- MUS-2488 TODO: Remove this check once Open Cloud supports Plugin asset types
+		if asset.type == "Plugin" then
+			return false, "plugin asset types are not yet supported by Open Cloud"
+		end
+
 		if not value.environments[asset.environment] then
 			return false, `asset "{key}" attempts to use the environment "{asset.environment}" which does not exist`
 		end
