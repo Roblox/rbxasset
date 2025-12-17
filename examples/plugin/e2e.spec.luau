@@ -38,7 +38,7 @@ test.case("uploads to the Creator Store", function()
 	appendTextForTesting(path, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		run("lune", { "run", "deploy.luau", apiKey }, {
+		run("lute", { "scripts/deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -67,7 +67,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		run("lune", { "run", "deploy.luau", apiKey }, {
+		run("lute", { "scripts/deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -88,7 +88,7 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lune", { "run", "deploy.luau", apiKey }, {
+	run("lute", { "scripts/deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
