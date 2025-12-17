@@ -26,7 +26,9 @@ local function installGitDependencies()
 		})
 
 		local linkerPath = `{PACKAGES_PATH}/{projectName}.luau`
-		fs.writestringtofile(linkerPath, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
+		local handle = fs.open(linkerPath, "w+")
+		fs.write(handle, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
+		fs.close(handle)
 	end
 end
 

@@ -15,7 +15,9 @@ local function getOrCreateAssetLockfile(packagePath: string): Lockfile
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		content = fs.readfiletostring(lockfilePath)
+		local handle = fs.open(lockfilePath)
+		content = fs.read(handle)
+		fs.close(handle)
 	end)
 
 	local parsedLockfile = if success then toml.deserialize(content) else nil

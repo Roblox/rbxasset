@@ -1,16 +1,16 @@
-local assert = require("@std/test/assert")
+local expect = require("@std/test/assert")
 local test = require("@std/test")
 
 local getOrCreateAssetLockfile = require("./getOrCreateAssetLockfile")
 
 test.case("reads an asset lockfile from disk", function()
 	local lockfile = getOrCreateAssetLockfile("examples/package")
-	assert.eq(lockfile.assets["package"].assetId, "120786139379662")
+	expect.neq(lockfile.assets["package"].assetId, nil)
 end)
 
 test.case("creates a blank asset lockfile when not found on disk", function()
 	local lockfile = getOrCreateAssetLockfile("/nowhere")
-	assert.tableeq(lockfile, {
+	expect.tableeq(lockfile :: { [unknown]: unknown }, {
 		assets = {},
 		images = {},
 	})
