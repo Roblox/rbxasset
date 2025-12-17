@@ -41,7 +41,6 @@ test.case("uploads to the Creator Store", function()
 	local success, result = pcall(function()
 		run("lune", { "run", "deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
-			stdio = "inherit",
 		})
 	end)
 
@@ -69,7 +68,6 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	local success, result = pcall(function()
 		run("lune", { "run", "deploy.luau", apiKey }, {
 			cwd = ROOT_PATH,
-			stdio = "inherit",
 		})
 	end)
 
@@ -91,7 +89,6 @@ test.case("does not publish a new version when there are no changes", function()
 
 	run("lune", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
-		stdio = "inherit",
 	})
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
