@@ -22,24 +22,7 @@ jobs:
         run: lute scripts/install.luau
 
       - name: Run unit tests
-        run: lute scripts/test.luau
-
-  test-e2e:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: Roblox/setup-foreman@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allow-external-github-orgs: true
-
-      - name: Install dependencies
-        run: lune run install
-
-      - name: Run end-to-end tests
-        run: lune run test-e2e
+        run: lute scripts/test.luau --e2e
         env:
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
 
