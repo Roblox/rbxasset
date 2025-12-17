@@ -27,7 +27,10 @@ local function appendTextForTesting(path: string, text: string)
 	fs.close(handle)
 end
 
-run("rojo", { "build", "-o", "plugin.rbxm" }, {
+run("rojo", { "build", `plugin/default.project.json`, "-o", "plugin.rbxm" }, {
+	cwd = ROOT_PATH,
+})
+run("rojo", { "build", `package/default.project.json`, "-o", "package.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -82,11 +85,15 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.write(handle, toml.serialize(manifest))
 	fs.close(handle)
 
-	run("lute", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lute", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
 	run("git", { "restore", MANIFEST_PATH })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
@@ -110,11 +117,15 @@ test.case("only publishes a new version for changed workspace members", function
 	local path = `{ROOT_PATH}/package/src/init.luau`
 	appendTextForTesting(path, `\nprint("New!")`)
 
-	run("lute", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lute", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
 	run("git", { "restore", path })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)

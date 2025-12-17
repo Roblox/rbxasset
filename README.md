@@ -77,39 +77,9 @@ rbxasset.publishPackageAsync(process.cwd(), "default", apiKey)
 $ lute scripts/publish.luau <API_KEY>
 ```
 
-Where `<API_KEY>` represents an Open Cloud API key. See below for the exact setup for the key.
-
-## Open Cloud setup
-
-To get this all working you will need two things: an Open Cloud API key, and an Experience to handle asset publishing.
-
-### Asset uploader experience
-
-Create a new Experience for the user or group that will own the asset. A fresh Baseplate named anything you like will do just fine.
-
-![Screenshot of the Publish Game dialog window in Studio for uploading the new Experience. The name is set to "Asset Uploader" and is being published to a Group](img/publish-game-dialog.png)
-
-Once the Experience is published, run the following from the command line:
-
-```luau
-print(game.GameId, game.PlaceId)
-```
-
-Copy both values and add them to `rbxasset.toml` for the environment's `universeId` and `placeId`, respectively.
-
-> [!NOTE]
-> In the future the hope is to not require an Experience to be created for the purpose of asset uploading. The reason this is needed right now is to close the gap of creating/updating the asset on the Creator Store via `CreateAssetAsync` and `CreateAssetVersionAsync`. If/when Open Cloud supports taking an rbxm file as input to create/update an asset, it will no longer be a requirement to setup an experience for asset uploading
-
-### API key
-
-An Open Cloud API key with the following scopes is required:
-* `asset:read` and `asset:write`
-* `universe-places:write`
-* `universe.place.luau-execution-session:write`
-
-The resulting permissions should be setup similar to the following:
-
-![Screenshot of the Edit API Key page showing the Access Permissions section](img/access-permissions.png)
+Where `<API_KEY>` represents an Open Cloud API key that has the following scopes:
+* `asset:read`
+* `asset:write`
 
 # Manifest format
 
