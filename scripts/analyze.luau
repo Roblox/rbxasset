@@ -1,15 +1,10 @@
 local run = require("@root/lib/run")
 
-run(
-	"luau-lsp",
-	{
-		"analyze",
-		"--settings=.vscode/settings.json",
-		`--ignore="**/pkg/**"`,
-		"--platform=standard",
+run("luau-lsp", {
+	"analyze",
+	"--settings=.vscode/settings.json",
 
-		"examples",
-		"scripts",
-		"src",
-	} :: { string }
-)
+	"examples",
+	"scripts",
+	"src",
+})
