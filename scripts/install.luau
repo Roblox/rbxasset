@@ -36,6 +36,7 @@ local function installLuteBatteries()
 	local commit = "4c5adb2"
 	local batteries = {
 		"cli.luau",
+		"pp.luau",
 		--[[
 		 	TODO: Install the TOML battery once this issue is fixed:
 		 	https://github.com/luau-lang/lute/issues/643

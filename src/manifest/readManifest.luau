@@ -1,4 +1,5 @@
 local fs = require("@lute/fs")
+local pp = require("@pkg/pp")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -19,7 +20,7 @@ local function readManifest(packagePath: string): Manifest
 	local isManifestValid, message = types.validateManifest(parsedContent)
 	assert(isManifestValid, `failed to parse asset manifest at {manifestPath}: {message}`)
 
-	logging.debug("loaded asset manifest", parsedContent)
+	logging.debug("loaded asset manifest", pp(parsedContent))
 
 	return parsedContent :: Manifest
 end

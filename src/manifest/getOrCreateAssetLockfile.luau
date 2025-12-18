@@ -1,4 +1,5 @@
 local fs = require("@lute/fs")
+local pp = require("@pkg/pp")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -29,7 +30,7 @@ local function getOrCreateAssetLockfile(packagePath: string): Lockfile
 	local isLockfileValid, message = types.validateLockfile(lockfile)
 	assert(isLockfileValid, `failed to parse asset lockfile at {lockfilePath}: {message}`)
 
-	logging.debug(`loaded asset lockfile {lockfile}`)
+	logging.debug(`loaded asset lockfile {pp(lockfile)}`)
 
 	return lockfile
 end
