@@ -6,6 +6,7 @@ local serde = require("@lune/serde")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
+local run = require("@root/lib/run")
 
 local test = frktest.test
 local check = frktest.assert.check
@@ -26,7 +27,10 @@ local function appendTextForTesting(path: string, text: string)
 	fs.writeFile(path, content)
 end
 
-process.exec("rojo", { "build", "-o", "plugin.rbxm" }, {
+run("rojo", { "build", `plugin/default.project.json`, "-o", "plugin.rbxm" }, {
+	cwd = ROOT_PATH,
+})
+run("rojo", { "build", `package/default.project.json`, "-o", "package.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -46,11 +50,15 @@ test.case("uploads each workspace member to the Creator Store", function()
 		appendTextForTesting(path, `\nprint("New!")`)
 	end
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lune", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", table.unpack(filesToChange) })
+	run("git", { "restore", table.unpack(filesToChange) })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
@@ -75,11 +83,15 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 
 	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lune", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", MANIFEST_PATH })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
@@ -103,11 +115,15 @@ test.case("only publishes a new version for changed workspace members", function
 	local path = `{ROOT_PATH}/package/src/init.luau`
 	appendTextForTesting(path, `\nprint("New!")`)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lune", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", path })
+	run("git", { "restore", path })
+
+	assert(success, result)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)

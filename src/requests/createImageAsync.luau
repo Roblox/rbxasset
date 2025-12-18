@@ -3,16 +3,17 @@ local serde = require("@lune/serde")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
+local types = require("@root/types")
 local waitForAssetOperationAsync = require("@root/requests/waitForAssetOperationAsync")
 
 local function createImageAsync(
 	displayName: string,
 	imagePath: string,
 	creatorId: number,
-	creatorType: "User" | "Group",
+	creatorType: types.CreatorType,
 	apiKey: string
 )
-	local creatorIdKey = if creatorType == "User" then "userId" else "groupId"
+	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
 
 	local formData = createFormData({
 		request = {

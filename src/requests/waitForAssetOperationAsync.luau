@@ -27,10 +27,11 @@ local function waitForAssetOperationAsync(operationId: string, apiKey: string): 
 			return body
 		else
 			task.wait(retryPollingDelay)
+			currentRetries += 1
 			retryPollingDelay *= RETRY_MULTIPLIER
 		end
 	end
-	error(`operation "{operationId}" did not complete within {MAX_RETRIES} attempts`)
+	error(`operation {operationId} did not complete within {MAX_RETRIES} attempts`)
 end
 
 return waitForAssetOperationAsync

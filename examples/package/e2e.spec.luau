@@ -6,6 +6,7 @@ local serde = require("@lune/serde")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
+local run = require("@root/lib/run")
 
 local test = frktest.test
 local check = frktest.assert.check
@@ -25,7 +26,7 @@ assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-process.exec("rojo", { "build", "-o", "asset.rbxm" }, {
+run("rojo", { "build", "-o", "asset.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -36,11 +37,15 @@ test.case("uploads rbxm to the Creator Store", function()
 	local path = `{ROOT_PATH}/src/init.luau`
 	appendTextForTesting(path, `\nprint("New!")`)
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, result = pcall(function()
+		run("lune", { "run", "deploy.luau", apiKey }, {
+			cwd = ROOT_PATH,
+		})
+	end)
 
-	process.exec("git", { "restore", path })
+	run("git", { "restore", path })
+
+	assert(success, result)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
@@ -59,11 +64,11 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 
 	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+	run("lune", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 
-	process.exec("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", MANIFEST_PATH })
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
@@ -77,7 +82,7 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	process.exec("lune", { "run", "deploy.luau", apiKey }, {
+	run("lune", { "run", "deploy.luau", apiKey }, {
 		cwd = ROOT_PATH,
 	})
 

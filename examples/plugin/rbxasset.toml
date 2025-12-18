@@ -4,7 +4,9 @@ model = "plugin.rbxm"
 environment = "production"
 description = "Longform description"
 icon = "icon.png"
-type = "Plugin"
+# MUS-2488 TODO: Once Open Cloud supports uploading Plugin asset types, change
+# this back to "Plugin"
+type = "Package"
 
 [environments.production]
 creatorId = 8701739411
