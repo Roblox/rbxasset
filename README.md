@@ -7,7 +7,7 @@ Deploy rbxm files from GitHub to the Creator Store.
 # Installation
 
 > [!NOTE]
-> [Lute](https://github.com/luau-lang/lute) v0.1.0-nightly.20251023+ is required.
+> [Lute](https://github.com/luau-lang/lute) v0.1.0-nightly.20251217+ is required.
 
 ## Prebuilt zip (recommended)
 
