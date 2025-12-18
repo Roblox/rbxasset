@@ -71,7 +71,7 @@ local function publishAssetAsync(
 		local formData = createFormData({
 			request = {
 				value = {
-					assetType = "Model", -- TODO: Allow for publishing Plugins
+					assetType = "Model", -- MUS-2488 TODO: Allow for publishing Plugins
 					displayName = asset.name,
 					creationContext = {
 						creator = {
