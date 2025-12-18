@@ -21,7 +21,8 @@ local function waitForAssetOperationAsync(operationId: string, apiKey: string): 
 			},
 		})
 
-		-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+		-- FIXME: Narrow the return value of `json.deserialize` instead of
+		-- casting to `any`
 		local body: any = json.deserialize(res.body)
 
 		if res.ok and body.done then

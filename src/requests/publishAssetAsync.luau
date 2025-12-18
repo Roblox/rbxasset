@@ -63,7 +63,9 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = json.deserialize(res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting
+		-- to `any`
+		local body: any = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 
@@ -101,7 +103,9 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = json.deserialize(res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting
+		-- to `any`
+		local body: any = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 

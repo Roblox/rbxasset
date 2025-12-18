@@ -29,7 +29,8 @@ local function fetch(url: string, options: FetchOptions)
 	else
 		-- TODO: This block might need to be revised to work with Lute
 
-		-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+		-- FIXME: Narrow the return value of `json.deserialize` instead of
+		-- casting to `any`
 		local body: any = json.deserialize(res.body)
 
 		local problems: { string } = {}
