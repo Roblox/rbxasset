@@ -20,7 +20,7 @@ local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
 local function appendTextForTesting(path: string, text: string)
-	local handle = fs.open(path, "w")
+	local handle = fs.open(path, "w+")
 	local content = fs.read(handle)
 	content ..= text
 	fs.write(handle, content)

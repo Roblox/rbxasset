@@ -15,6 +15,10 @@ local function createImageAsync(
 )
 	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
 
+	local imageHandle = fs.open(imagePath, "r")
+	local imageContent = fs.read(imageHandle)
+	fs.close(imageHandle)
+
 	local formData = createFormData({
 		request = {
 			value = {
@@ -30,7 +34,7 @@ local function createImageAsync(
 		},
 		fileContent = {
 			filename = imagePath:match("[/\\](.+)$"),
-			value = fs.readfiletostring(imagePath),
+			value = imageContent,
 			contentType = "image/png",
 		},
 	})

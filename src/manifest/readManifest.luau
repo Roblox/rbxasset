@@ -11,7 +11,10 @@ type Manifest = types.Manifest
 local function readManifest(packagePath: string): Manifest
 	local manifestPath = `{packagePath}/{constants.ASSET_MANIFEST_FILENAME}`
 	local success, result = pcall(function()
-		return fs.readfiletostring(manifestPath)
+		local handle = fs.open(manifestPath, "r")
+		local content = fs.read(handle)
+		fs.close(handle)
+		return content
 	end)
 	assert(success, `failed to read asset manifest at {manifestPath}: {result}`)
 

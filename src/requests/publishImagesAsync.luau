@@ -34,10 +34,13 @@ local function publishImagesAsync(
 	local icon = assetConfig.icon
 	if icon then
 		local iconPath = `{projectPath}/{icon}`
+		local iconHandle = fs.open(iconPath, "r")
+		local iconContent = fs.read(iconHandle)
+		fs.close(iconHandle)
 
 		logging.info(`syncing package icon at {iconPath}`)
 
-		local iconHash = toSha256String(fs.readfiletostring(iconPath))
+		local iconHash = toSha256String(iconContent)
 
 		if existingImages and existingImages[icon] and existingImages[icon].hash == iconHash then
 			logging.debug(`hashes match for {iconPath}, skipping...`)
@@ -75,7 +78,11 @@ local function publishImagesAsync(
 
 		for index, thumbnailFilename in thumbnails do
 			local thumbnailPath = `{projectPath}/{thumbnailFilename}`
-			local thumbnailHash = toSha256String(fs.readfiletostring(thumbnailPath))
+			local thumbnailHandle = fs.open(thumbnailPath, "r")
+			local thumbnailContent = fs.read(thumbnailHandle)
+			fs.close(thumbnailHandle)
+
+			local thumbnailHash = toSha256String(thumbnailContent)
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
 			if existingThumbnail and existingThumbnail.hash == thumbnailHash then
@@ -117,9 +124,13 @@ local function publishImagesAsync(
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
+			local pendingImageHandle = fs.open(pendingImage.path)
+			local pendingImageContent = fs.read(pendingImageHandle)
+			fs.close(pendingImageHandle)
+
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,
-				hash = toSha256String(fs.readfiletostring(pendingImage.path)),
+				hash = toSha256String(pendingImageContent),
 			}
 
 			logging.debug(
