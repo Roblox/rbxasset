@@ -38,7 +38,10 @@ test.case("uploads to the Creator Store", function()
 	appendTextForTesting(path, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { "scripts/deploy.luau", apiKey }, {
+		return run("lute", { "deploy.luau" }, {
+			env = {
+				ROBLOX_API_KEY = apiKey,
+			},
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -67,7 +70,10 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { "scripts/deploy.luau", apiKey }, {
+		return run("lute", { "deploy.luau" }, {
+			env = {
+				ROBLOX_API_KEY = apiKey,
+			},
 			cwd = ROOT_PATH,
 		})
 	end)
@@ -88,7 +94,10 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lute", { "scripts/deploy.luau", apiKey }, {
+	run("lute", { "deploy.luau" }, {
+		env = {
+			ROBLOX_API_KEY = apiKey,
+		},
 		cwd = ROOT_PATH,
 	})
 
