@@ -1,5 +1,5 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@lute/fs")
+local json = require("@std/json")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -30,9 +30,13 @@ local function publishAssetAsync(
 	local existingAssetId = if existingAsset then existingAsset.assetId else nil
 	local assetDetails = if existingAssetId then getAssetDetailsAsync(existingAssetId, apiKey) else nil
 
-	local creatorIdKey = if environment.creatorType == "User" then "userId" else "groupId"
+	local creatorIdKey = if environment.creatorType == types.CreatorType.User then "userId" else "groupId"
 
 	local assetId
+
+	local modelHandle = fs.open(asset.model)
+	local modelContent = fs.read(modelHandle)
+	fs.close(modelHandle)
 
 	if assetDetails and assetDetails.assetId then
 		logging.info("publishing new version...")
@@ -45,7 +49,7 @@ local function publishAssetAsync(
 			},
 			fileContent = {
 				filename = asset.model,
-				value = fs.readFile(asset.model),
+				value = modelContent,
 				contentType = "model/x-rbxm",
 			},
 		})
@@ -59,7 +63,7 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = serde.decode("json", res.body)
+		local body = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 
@@ -71,7 +75,7 @@ local function publishAssetAsync(
 		local formData = createFormData({
 			request = {
 				value = {
-					assetType = "Model", -- TODO: Allow for publishing Plugins
+					assetType = "Model", -- MUS-2488 TODO: Allow for publishing Plugins
 					displayName = asset.name,
 					creationContext = {
 						creator = {
@@ -83,7 +87,7 @@ local function publishAssetAsync(
 			},
 			fileContent = {
 				filename = asset.model,
-				value = fs.readFile(asset.model),
+				value = modelContent,
 				contentType = "model/x-rbxm",
 			},
 		})
@@ -97,7 +101,7 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = serde.decode("json", res.body)
+		local body = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 
