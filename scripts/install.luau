@@ -36,7 +36,14 @@ local function installLuteBatteries()
 	local commit = "4c5adb2"
 	local batteries = {
 		"cli.luau",
-		"toml.luau",
+		--[[
+		 	TODO: Install the TOML battery once this issue is fixed:
+		 	https://github.com/luau-lang/lute/issues/643
+
+			Currently we use a patched version of this module at
+			`src/lib/toml.luau` which supports quoted dictionary keys.
+		]]
+		-- "toml.luau",
 	}
 
 	run("mkdir", { "-p", PACKAGES_PATH })

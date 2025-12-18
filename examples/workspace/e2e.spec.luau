@@ -2,7 +2,7 @@ local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
 local process = require("@lute/process")
 local test = require("@std/test")
-local toml = require("@pkg/toml")
+local toml = require("@root/lib/toml")
 
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")

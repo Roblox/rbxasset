@@ -1,5 +1,5 @@
 local fs = require("@lute/fs")
-local toml = require("@pkg/toml")
+local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
 local join = require("@root/lib/join")
