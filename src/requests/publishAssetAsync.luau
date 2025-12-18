@@ -30,7 +30,7 @@ local function publishAssetAsync(
 	local existingAssetId = if existingAsset then existingAsset.assetId else nil
 	local assetDetails = if existingAssetId then getAssetDetailsAsync(existingAssetId, apiKey) else nil
 
-	local creatorIdKey = if environment.creatorType == "User" then "userId" else "groupId"
+	local creatorIdKey = if environment.creatorType == types.CreatorType.User then "userId" else "groupId"
 
 	local assetId
 

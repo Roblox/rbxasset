@@ -11,7 +11,21 @@ local function countObject(obj: { [any]: any }): number
 end
 
 export type AssetType = "Package" | "Plugin"
+
+local AssetType = {
+	Package = "Package" :: "Package",
+	Plugin = "Plugin" :: "Plugin",
+}
+types.AssetType = AssetType
+
 export type CreatorType = "User" | "Group"
+
+local CreatorType = {
+	User = "User" :: "User",
+	Group = "Group" :: "Group",
+}
+types.CreatorType = CreatorType
+
 export type AssetId = string | number
 
 export type AssetConfig = {
@@ -42,7 +56,7 @@ types.validateAssetConfig = t.strictInterface({
 	model = t.string,
 	environment = t.string,
 
-	type = t.optional(t.union(t.literal("Package"), t.literal("Plugin"))),
+	type = t.optional(t.union(t.literal(AssetType.Package), t.literal(AssetType.Plugin))),
 	description = t.optional(t.string),
 	icon = t.optional(t.string),
 	thumbnails = t.optional(t.array(t.string)),
@@ -50,13 +64,13 @@ types.validateAssetConfig = t.strictInterface({
 
 export type EnvironmentConfig = {
 	creatorId: number,
-	creatorType: "User" | "Group",
+	creatorType: CreatorType,
 	universeId: number,
 	placeId: number,
 }
 types.validateEnvironmentConfig = t.strictInterface({
 	creatorId = t.union(t.string, t.number),
-	creatorType = t.union(t.literal("User"), t.literal("Group")),
+	creatorType = t.union(t.literal(CreatorType.User), t.literal(CreatorType.Group)),
 	universeId = t.number,
 	placeId = t.number,
 })

@@ -17,7 +17,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
@@ -42,7 +42,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
@@ -58,7 +58,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
@@ -103,7 +103,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
@@ -128,7 +128,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
@@ -156,7 +156,7 @@ test.suite("validateManifest", function()
 			environments = {
 				production = {
 					creatorId = 1234567,
-					creatorType = "User",
+					creatorType = types.CreatorType.User,
 					universeId = 10101010,
 					placeId = 20202020,
 				},
