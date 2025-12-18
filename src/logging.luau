@@ -1,5 +1,5 @@
 local process = require("@lute/process")
--- local stdio = require("@lute/stdio")
+local richterm = require("@pkg/richterm")
 
 type LogLevel = "info" | "warn" | "err" | "debug"
 
@@ -34,31 +34,25 @@ local logging = {}
 
 function logging.info(...)
 	if canLog("info") then
-		print(`[info]`, ...)
+		print(richterm.blue(`[info] {...}`))
 	end
 end
 
 function logging.warn(...)
 	if canLog("warn") then
-		-- stdio.write(stdio.color("yellow"))
-		print(`[warn]`, ...)
-		-- stdio.write(stdio.color("reset"))
+		print(richterm.yellow(`[warn] {...}`))
 	end
 end
 
 function logging.err(...)
 	if canLog("err") then
-		-- stdio.write(stdio.color("red"))
-		print(`[err]`, ...)
-		-- stdio.write(stdio.color("reset"))
+		print(richterm.red(`[err] {...}`))
 	end
 end
 
 function logging.debug(...)
 	if canLog("debug") then
-		-- stdio.write(stdio.color("black"))
-		print(`[debug]`, ...)
-		-- stdio.write(stdio.color("reset"))
+		print(richterm.black(`[debug] {...}`))
 	end
 end
 

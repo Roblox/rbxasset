@@ -1,4 +1,5 @@
 local process = require("@lute/process")
+local richterm = require("@pkg/richterm")
 
 type Options = {
 	cwd: string?,
@@ -8,9 +9,8 @@ type Options = {
 
 local function run(program: string, params: { string }, options: Options?): string
 	local command = `{program} {table.concat(params, " ")}`
-	-- stdio.write(stdio.style("bold"))
-	print(`> {command}`)
-	-- stdio.write(stdio.style("reset"))
+
+	print(richterm.bold(`> {command}`))
 
 	local result = process.run({
 		program,

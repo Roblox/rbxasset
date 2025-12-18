@@ -44,6 +44,7 @@ local function installLuteBatteries()
 			`src/lib/toml.luau` which supports quoted dictionary keys.
 		]]
 		-- "toml.luau",
+		"richterm.luau",
 	}
 
 	run("mkdir", { "-p", PACKAGES_PATH })
