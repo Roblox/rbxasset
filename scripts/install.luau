@@ -8,6 +8,15 @@ local PACKAGE_INDEX_NAME = "_Index"
 -- depend on them, and it makes it really hard to write install steps
 -- without those functions
 do
+	if fs.exists(PACKAGES_PATH) then
+		process.run({
+			"rm",
+			"-rf",
+			PACKAGES_PATH,
+		})
+	end
+	fs.mkdir(PACKAGES_PATH)
+
 	local function installLuteBatteries()
 		local commit = "fc19ad0"
 		local batteries = {
@@ -24,16 +33,9 @@ do
 			"richterm.luau",
 		}
 
-		process.run({
-			"mkdir",
-			"-p",
-			PACKAGES_PATH,
-		}, {
-			stdio = "inherit",
-		})
-
 		for _, battery in batteries do
 			print(`installing Lute battery: {battery}`)
+
 			process.run({
 				"curl",
 				"-LO",
@@ -78,8 +80,6 @@ do
 			fs.close(handle)
 		end
 	end
-
-	run("rm", { "-rf", PACKAGES_PATH })
 
 	-- Setup typedefs for the current Lute version
 	run("lute", { "setup" })
