@@ -1,3 +1,5 @@
+--!nonstrict
+
 -- upstream: https://github.com/luau-lang/lute/blob/fc19ad0b29cd6cae692607995dd6743f229c61b7/batteries/toml.luau
 
 local toml = {}

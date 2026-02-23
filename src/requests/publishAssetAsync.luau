@@ -120,13 +120,13 @@ local function publishAssetAsync(
 			description = asset.description,
 		})
 
-		local newLockfile: types.Lockfile = join(lockfile, {
+		local newLockfile = join(lockfile, {
 			assets = join(lockfile.assets, {
 				[assetName] = join(lockfile.assets[assetName], {
 					assetId = assetId,
 				}),
 			}),
-		})
+		}) :: types.Lockfile
 
 		writeLockfile(projectPath, newLockfile)
 	end

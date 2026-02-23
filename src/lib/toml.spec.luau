@@ -1,3 +1,5 @@
+--!nonstrict
+
 local expect = require("@std/test/assert")
 local test = require("@std/test")
 
