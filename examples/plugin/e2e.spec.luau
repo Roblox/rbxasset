@@ -19,6 +19,7 @@ local function appendTextForTesting(path: string, text: string)
 	fs.write(handle, content)
 	fs.close(handle)
 end
+
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
 

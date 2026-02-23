@@ -1,11 +1,8 @@
 local cli = require("@pkg/cli")
-local luau = require("@std/luau")
 local process = require("@lute/process")
-local test = require("@std/test")
 
 local dotenv = require("./lib/dotenv")
-local find = require("./lib/find")
-local logging = require("@root/logging")
+local run = require("@root/lib/run")
 
 local args = cli.parser()
 
@@ -22,27 +19,12 @@ dotenv()
 
 local apiKey = args:get("apiKey") or process.env.ROBLOX_API_KEY
 
-local function loadTestCases(path: string)
-	local files = find(path, "%.spec%.luau")
-
-	logging.info("spec files:")
-	for _, file in files do
-		logging.info(`  {file}`)
-	end
-
-	for _, file in files do
-		luau.loadbypath(file)
-	end
-end
-
-loadTestCases("src")
+run("lute", { "test", "src" })
 
 if args:has("e2e") then
 	-- We need to set the API key as an env variable so the E2E tests also have
 	-- access to it
 	process.env.ROBLOX_API_KEY = apiKey
 
-	loadTestCases("examples")
+	run("lute", { "test", "examples" })
 end
-
-test.run()
