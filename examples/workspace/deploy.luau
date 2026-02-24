@@ -1,4 +1,4 @@
-local rbxasset = require("@root/init")
+local rbxasset = require("@root")
 
 local process = require("@lute/process")
 
