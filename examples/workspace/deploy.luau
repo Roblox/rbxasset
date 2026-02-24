@@ -3,10 +3,10 @@ local process = require("@lute/process")
 
 local rbxasset = require("@root")
 
-process.system(`rojo build -o {path.resolve("./package.rbxm")}`, {
+process.system("rojo build -o package.rbxm", {
 	cwd = path.resolve("./package/"),
 })
-process.system(`rojo build -o {path.resolve("./plugin.rbxm")}`, {
+process.system("rojo build -o plugin.rbxm", {
 	cwd = path.resolve("./plugin/"),
 })
 

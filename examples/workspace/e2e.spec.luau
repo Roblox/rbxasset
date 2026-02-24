@@ -11,7 +11,8 @@ local readManifest = require("@root/manifest/readManifest")
 local run = require("@root/lib/run")
 
 local ROOT_PATH = path.resolve("examples/workspace")
-local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
+local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
+local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
@@ -48,9 +49,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 	end
 
 	local success, result = pcall(function()
-		return run("lute", { "deploy.luau", apiKey }, {
-			cwd = ROOT_PATH,
-		})
+		return run("lute", { DEPLOY_SCRIPT, apiKey })
 	end)
 
 	run("git", { "restore", table.unpack(filesToChange) })
@@ -83,11 +82,10 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { "deploy.luau" }, {
+		return run("lute", { DEPLOY_SCRIPT }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},
-			cwd = ROOT_PATH,
 		})
 	end)
 
@@ -118,11 +116,10 @@ test.case("only publishes a new version for changed workspace members", function
 	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { "deploy.luau" }, {
+		return run("lute", { DEPLOY_SCRIPT }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},
-			cwd = ROOT_PATH,
 		})
 	end)
 

@@ -11,7 +11,8 @@ local readManifest = require("@root/manifest/readManifest")
 local run = require("@root/lib/run")
 
 local ROOT_PATH = path.resolve("examples/plugin")
-local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
+local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
+local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
 local function appendTextForTesting(filePath: string, text: string)
 	local handle = fs.open(filePath, "w")
@@ -34,19 +35,18 @@ test.case("uploads to the Creator Store", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	local filePath = `{ROOT_PATH}/src/init.plugin.luau`
-	appendTextForTesting(filePath, `\nprint("New!")`)
+	local filePath = path.join(ROOT_PATH, "src/init.plugin.luau")
+	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { "deploy.luau" }, {
+		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},
-			cwd = ROOT_PATH,
 		})
 	end)
 
-	run("git", { "restore", filePath })
+	run("git", { "restore", tostring(filePath) })
 
 	assert(success, result)
 
@@ -65,20 +65,19 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
-	local handle = fs.open(MANIFEST_PATH, "w")
+	local handle = fs.open(tostring(MANIFEST_PATH), "w")
 	fs.write(handle, toml.serialize(manifest))
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { "deploy.luau" }, {
+		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},
-			cwd = ROOT_PATH,
 		})
 	end)
 
-	run("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", tostring(MANIFEST_PATH) })
 
 	assert(success, result)
 
@@ -94,11 +93,10 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lute", { "deploy.luau" }, {
+	run("lute", { tostring(DEPLOY_SCRIPT) }, {
 		env = {
 			ROBLOX_API_KEY = apiKey,
 		},
-		cwd = ROOT_PATH,
 	})
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
