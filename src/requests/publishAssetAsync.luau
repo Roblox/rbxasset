@@ -1,5 +1,6 @@
 local fs = require("@lute/fs")
 local json = require("@std/json")
+local path = require("@std/path")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -16,7 +17,7 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 local function publishAssetAsync(
-	projectPath: string,
+	projectPath: path.pathlike,
 	assetName: string,
 	asset: AssetConfig,
 	environment: EnvironmentConfig,

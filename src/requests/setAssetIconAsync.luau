@@ -1,4 +1,5 @@
 local json = require("@std/json")
+local path = require("@std/path")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -11,7 +12,12 @@ type AssetConfig = types.AssetConfig
 
 local ASSETS_BASE_URL = "https://apis.roblox.com/assets/v1"
 
-local function setAssetIconAsync(projectPath: string, assetName: string, assetConfig: AssetConfig, apiKey: string)
+local function setAssetIconAsync(
+	projectPath: path.pathlike,
+	assetName: string,
+	assetConfig: AssetConfig,
+	apiKey: string
+)
 	if not assetConfig.icon then
 		logging.debug("no icon in the asset manifest. skipping...")
 		return

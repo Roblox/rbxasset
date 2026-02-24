@@ -1,4 +1,5 @@
 local fs = require("@lute/fs")
+local path = require("@std/path")
 local pp = require("@pkg/pp")
 local toml = require("@root/lib/toml")
 
@@ -9,14 +10,14 @@ local types = require("@root/types")
 
 type Lockfile = types.Lockfile
 
-local function getOrCreateAssetLockfile(packagePath: string): Lockfile
-	local lockfilePath = `{packagePath}/{constants.ASSET_LOCKFILE_FILENAME}`
+local function getOrCreateAssetLockfile(packagePath: path.pathlike): Lockfile
+	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
 
 	-- It's expected that the lockfile won't exist in certain situations, like
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		local handle = fs.open(lockfilePath)
+		local handle = fs.open(tostring(lockfilePath))
 		content = fs.read(handle)
 		fs.close(handle)
 	end)

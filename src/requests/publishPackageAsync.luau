@@ -1,4 +1,5 @@
--- local process = require("@lute/process")
+local path = require("@std/path")
+local process = require("@lute/process")
 
 local logging = require("@root/logging")
 local publishAssetAsync = require("@root/requests/publishAssetAsync")
@@ -6,14 +7,13 @@ local publishImagesAsync = require("@root/requests/publishImagesAsync")
 local readManifest = require("@root/manifest/readManifest")
 local setAssetIconAsync = require("@root/requests/setAssetIconAsync")
 
-local function publishPackageAsync(projectPath: string, assetName: string, apiKey: string)
+local function publishPackageAsync(projectPath: path.pathlike, assetName: string, apiKey: string)
 	local manifest = readManifest(projectPath)
 
 	local asset = manifest.assets[assetName]
 	if not asset then
 		logging.err(`publishing failed, could not find an asset named {assetName} in the manifest`)
-		-- process.exit(1)
-		error(1)
+		process.exit(1)
 	end
 
 	local environment = manifest.environments[asset.environment]

@@ -1,5 +1,6 @@
 local fs = require("@lute/fs")
 local json = require("@std/json")
+local path = require("@std/path")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -8,14 +9,14 @@ local waitForAssetOperationAsync = require("@root/requests/waitForAssetOperation
 
 local function createImageAsync(
 	displayName: string,
-	imagePath: string,
+	imagePath: path.pathlike,
 	creatorId: number,
 	creatorType: types.CreatorType,
 	apiKey: string
 )
 	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
 
-	local imageHandle = fs.open(imagePath, "r")
+	local imageHandle = fs.open(tostring(imagePath), "r")
 	local imageContent = fs.read(imageHandle)
 	fs.close(imageHandle)
 
@@ -33,7 +34,7 @@ local function createImageAsync(
 			contentType = "application/json",
 		},
 		fileContent = {
-			filename = imagePath:match("[/\\](.+)$"),
+			filename = path.basename(imagePath),
 			value = imageContent,
 			contentType = "image/png",
 		},

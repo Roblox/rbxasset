@@ -3,6 +3,11 @@ local process = require("@lute/process")
 
 local rbxasset = require("@root")
 
-process.system(`rojo build -o {path.resolve("./plugin.rbxm")}`)
+local args = { ... }
+local cwd = path.dirname(args[1])
 
-rbxasset.publishPackageAsync(path.resolve("."), "plugin", process.env.ROBLOX_API_KEY)
+process.system("rojo build -o plugin.rbxm", {
+	cwd = cwd,
+})
+
+rbxasset.publishPackageAsync(cwd, "plugin", process.env.ROBLOX_API_KEY)

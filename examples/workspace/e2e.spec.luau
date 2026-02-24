@@ -40,8 +40,8 @@ test.case("uploads each workspace member to the Creator Store", function()
 	local prevPluginRevisionId = pluginAssetDetails.revisionId
 
 	local filesToChange = {
-		`{ROOT_PATH}/package/src/init.luau`,
-		`{ROOT_PATH}/plugin/src/init.plugin.luau`,
+		tostring(path.join(ROOT_PATH, "package/src/init.luau")),
+		tostring(path.join(ROOT_PATH, "plugin/src/init.plugin.luau")),
 	}
 
 	for _, filePath in filesToChange do
@@ -49,7 +49,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 	end
 
 	local success, result = pcall(function()
-		return run("lute", { DEPLOY_SCRIPT, apiKey })
+		return run("lute", { tostring(DEPLOY_SCRIPT), apiKey })
 	end)
 
 	run("git", { "restore", table.unpack(filesToChange) })
@@ -82,7 +82,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { DEPLOY_SCRIPT }, {
+		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},
@@ -116,7 +116,7 @@ test.case("only publishes a new version for changed workspace members", function
 	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { DEPLOY_SCRIPT }, {
+		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
 			env = {
 				ROBLOX_API_KEY = apiKey,
 			},

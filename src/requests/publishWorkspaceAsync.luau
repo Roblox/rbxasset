@@ -1,10 +1,12 @@
+local path = require("@std/path")
+
 local logging = require("@root/logging")
 local publishAssetAsync = require("@root/requests/publishAssetAsync")
 local publishImagesAsync = require("@root/requests/publishImagesAsync")
 local readManifest = require("@root/manifest/readManifest")
 local setAssetIconAsync = require("@root/requests/setAssetIconAsync")
 
-local function publishWorkspaceAsync(projectPath: string, apiKey: string)
+local function publishWorkspaceAsync(projectPath: path.pathlike, apiKey: string)
 	local manifest = readManifest(projectPath)
 
 	for assetName, asset in manifest.assets do

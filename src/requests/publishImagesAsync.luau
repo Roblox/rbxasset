@@ -1,5 +1,6 @@
 local crypto = require("@lute/crypto")
 local fs = require("@lute/fs")
+local path = require("@std/path")
 
 local createImageAsync = require("@root/requests/createImageAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
@@ -11,7 +12,7 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 type PendingImage = {
-	path: string,
+	path: path.pathlike,
 	filename: string,
 	assetId: string,
 }
@@ -21,7 +22,7 @@ local function toSha256String(str: string): string
 end
 
 local function publishImagesAsync(
-	projectPath: string,
+	projectPath: path.pathlike,
 	assetConfig: AssetConfig,
 	environment: EnvironmentConfig,
 	apiKey: string
@@ -33,8 +34,8 @@ local function publishImagesAsync(
 
 	local icon = assetConfig.icon
 	if icon then
-		local iconPath = `{projectPath}/{icon}`
-		local iconHandle = fs.open(iconPath, "r")
+		local iconPath = path.join(projectPath, icon)
+		local iconHandle = fs.open(tostring(iconPath), "r")
 		local iconContent = fs.read(iconHandle)
 		fs.close(iconHandle)
 

@@ -1,4 +1,5 @@
 local fs = require("@lute/fs")
+local path = require("@std/path")
 local pp = require("@pkg/pp")
 local toml = require("@root/lib/toml")
 
@@ -8,10 +9,10 @@ local types = require("@root/types")
 
 type Manifest = types.Manifest
 
-local function readManifest(packagePath: string): Manifest
-	local manifestPath = `{packagePath}/{constants.ASSET_MANIFEST_FILENAME}`
+local function readManifest(packagePath: path.pathlike): Manifest
+	local manifestPath = path.join(packagePath, constants.ASSET_MANIFEST_FILENAME)
 	local success, result = pcall(function()
-		local handle = fs.open(manifestPath, "r")
+		local handle = fs.open(tostring(manifestPath), "r")
 		local content = fs.read(handle)
 		fs.close(handle)
 		return content
