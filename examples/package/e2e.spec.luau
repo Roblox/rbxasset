@@ -40,11 +40,7 @@ test.case("uploads rbxm to the Creator Store", function()
 	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
-			env = {
-				ROBLOX_API_KEY = apiKey,
-			},
-		})
+		return run("lute", { tostring(DEPLOY_SCRIPT) })
 	end)
 
 	run("git", { "restore", tostring(filePath) })
@@ -71,11 +67,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
-			env = {
-				ROBLOX_API_KEY = apiKey,
-			},
-		})
+		return run("lute", { tostring(DEPLOY_SCRIPT) })
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
@@ -94,11 +86,7 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lute", { tostring(DEPLOY_SCRIPT) }, {
-		env = {
-			ROBLOX_API_KEY = apiKey,
-		},
-	})
+	run("lute", { tostring(DEPLOY_SCRIPT) })
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 

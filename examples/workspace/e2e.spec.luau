@@ -1,5 +1,6 @@
 local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
+
 local path = require("@std/path")
 local process = require("@lute/process")
 local test = require("@std/test")
@@ -51,7 +52,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 	end
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT), apiKey })
+		return run("lute", { tostring(DEPLOY_SCRIPT) })
 	end)
 
 	run("git", { "restore", table.unpack(filePathsAsStrings) })
@@ -84,11 +85,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
-			env = {
-				ROBLOX_API_KEY = apiKey,
-			},
-		})
+		return run("lute", { tostring(DEPLOY_SCRIPT) })
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
@@ -118,11 +115,7 @@ test.case("only publishes a new version for changed workspace members", function
 	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
-			env = {
-				ROBLOX_API_KEY = apiKey,
-			},
-		})
+		return run("lute", { tostring(DEPLOY_SCRIPT) })
 	end)
 
 	run("git", { "restore", tostring(filePath) })
