@@ -52,7 +52,9 @@ test.case("uploads each workspace member to the Creator Store", function()
 	end
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) })
+		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
 	end)
 
 	run("git", { "restore", table.unpack(filePathsAsStrings) })
@@ -85,7 +87,9 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) })
+		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
@@ -115,7 +119,9 @@ test.case("only publishes a new version for changed workspace members", function
 	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) })
+		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
 	end)
 
 	run("git", { "restore", tostring(filePath) })

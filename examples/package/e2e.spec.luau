@@ -40,7 +40,9 @@ test.case("uploads rbxm to the Creator Store", function()
 	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) })
+		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
 	end)
 
 	run("git", { "restore", tostring(filePath) })
@@ -67,7 +69,9 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	fs.close(handle)
 
 	local success, result = pcall(function()
-		return run("lute", { tostring(DEPLOY_SCRIPT) })
+		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
@@ -86,7 +90,9 @@ test.case("does not publish a new version when there are no changes", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lute", { tostring(DEPLOY_SCRIPT) })
+	process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+		stdio = "inherit",
+	})
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
