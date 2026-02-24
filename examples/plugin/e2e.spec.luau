@@ -27,9 +27,7 @@ assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.plugin.assetId
 
-run("rojo", { "build", "-o", "plugin.rbxm" }, {
-	cwd = ROOT_PATH,
-})
+process.system(`rojo build -o {path.join(ROOT_PATH, "plugin.rbxm")}`)
 
 test.case("uploads to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)

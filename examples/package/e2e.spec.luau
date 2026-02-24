@@ -29,9 +29,7 @@ end
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-run("rojo", { "build", "-o", "asset.rbxm" }, {
-	cwd = ROOT_PATH,
-})
+process.system(`rojo build -o {path.join(ROOT_PATH, "asset.rbxm")}`)
 
 test.case("uploads rbxm to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)

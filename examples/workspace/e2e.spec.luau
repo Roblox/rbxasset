@@ -28,12 +28,8 @@ local function appendTextForTesting(filePath: string, text: string)
 	fs.close(handle)
 end
 
-run("rojo", { "build", "plugin/default.project.json", "-o", "plugin.rbxm" }, {
-	cwd = ROOT_PATH,
-})
-run("rojo", { "build", "package/default.project.json", "-o", "package.rbxm" }, {
-	cwd = ROOT_PATH,
-})
+process.system(`rojo build plugin/default.project.json -o {path.join(ROOT_PATH, "plugin.rbxm")}`)
+process.system(`rojo build package/default.project.json -o {path.join(ROOT_PATH, "package.rbxm")}`)
 
 test.case("uploads each workspace member to the Creator Store", function()
 	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
