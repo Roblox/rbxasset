@@ -14,8 +14,8 @@ local ROOT_PATH = path.resolve("examples/plugin")
 local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
 local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
-local function appendTextForTesting(filePath: string, text: string)
-	local handle = fs.open(filePath, "w")
+local function appendTextForTesting(filePath: path.pathlike, text: string)
+	local handle = fs.open(tostring(filePath), "w+")
 	local content = fs.read(handle)
 	content ..= text
 	fs.write(handle, content)
@@ -36,7 +36,7 @@ test.case("uploads to the Creator Store", function()
 	local prevRevisionId = assetDetails.revisionId
 
 	local filePath = path.join(ROOT_PATH, "src/init.plugin.luau")
-	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
+	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
 		return run("lute", { tostring(DEPLOY_SCRIPT) }, {

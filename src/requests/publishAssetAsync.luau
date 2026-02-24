@@ -35,7 +35,8 @@ local function publishAssetAsync(
 
 	local assetId
 
-	local modelHandle = fs.open(asset.model)
+	local modelPath = path.join(projectPath, asset.model)
+	local modelHandle = fs.open(tostring(modelPath))
 	local modelContent = fs.read(modelHandle)
 	fs.close(modelHandle)
 

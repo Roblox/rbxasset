@@ -6,11 +6,11 @@ local rbxasset = require("@root")
 local args = { ... }
 local cwd = path.dirname(args[1])
 
-process.system("rojo build -o package.rbxm", {
-	cwd = tostring(path.join(cwd, "package")),
+process.system("rojo build package -o package.rbxm", {
+	cwd = cwd,
 })
-process.system("rojo build -o plugin.rbxm", {
-	cwd = tostring(path.join(cwd, "plugin")),
+process.system("rojo build plugin -o plugin.rbxm", {
+	cwd = cwd,
 })
 
 rbxasset.publishWorkspaceAsync(cwd, process.env.ROBLOX_API_KEY)

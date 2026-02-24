@@ -21,8 +21,8 @@ local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
-local function appendTextForTesting(filePath: string, text: string)
-	local handle = fs.open(filePath, "w+")
+local function appendTextForTesting(filePath: path.pathlike, text: string)
+	local handle = fs.open(tostring(filePath), "w+")
 	local content = fs.read(handle)
 	content ..= text
 	fs.write(handle, content)
@@ -40,11 +40,13 @@ test.case("uploads each workspace member to the Creator Store", function()
 	local prevPluginRevisionId = pluginAssetDetails.revisionId
 
 	local filesToChange = {
-		tostring(path.join(ROOT_PATH, "package/src/init.luau")),
-		tostring(path.join(ROOT_PATH, "plugin/src/init.plugin.luau")),
+		path.join(ROOT_PATH, "package/src/init.luau"),
+		path.join(ROOT_PATH, "plugin/src/init.plugin.luau"),
 	}
+	local filePathsAsStrings: { string } = {}
 
 	for _, filePath in filesToChange do
+		table.insert(filePathsAsStrings, tostring(filePath))
 		appendTextForTesting(filePath, `\nprint("New!")`)
 	end
 
@@ -52,7 +54,7 @@ test.case("uploads each workspace member to the Creator Store", function()
 		return run("lute", { tostring(DEPLOY_SCRIPT), apiKey })
 	end)
 
-	run("git", { "restore", table.unpack(filesToChange) })
+	run("git", { "restore", table.unpack(filePathsAsStrings) })
 
 	assert(success, result)
 
@@ -77,7 +79,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
-	local handle = fs.open(MANIFEST_PATH, "w")
+	local handle = fs.open(tostring(MANIFEST_PATH), "w")
 	fs.write(handle, toml.serialize(manifest))
 	fs.close(handle)
 
@@ -89,7 +91,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 		})
 	end)
 
-	run("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", tostring(MANIFEST_PATH) })
 
 	assert(success, result)
 
@@ -112,8 +114,8 @@ test.case("only publishes a new version for changed workspace members", function
 
 	-- We make a change to a single workspace member so we can verify that only
 	-- that member was given a new revision after publishing
-	local filePath = `{ROOT_PATH}/package/src/init.luau`
-	appendTextForTesting(filePath, `\nprint("New!")`)
+	local filePath = path.join(ROOT_PATH, "package/src/init.luau")
+	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
 
 	local success, result = pcall(function()
 		return run("lute", { tostring(DEPLOY_SCRIPT) }, {
@@ -123,7 +125,7 @@ test.case("only publishes a new version for changed workspace members", function
 		})
 	end)
 
-	run("git", { "restore", filePath })
+	run("git", { "restore", tostring(filePath) })
 
 	assert(success, result)
 
