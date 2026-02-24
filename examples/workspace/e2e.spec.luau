@@ -1,5 +1,6 @@
 local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
+local path = require("@std/path")
 local process = require("@lute/process")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
@@ -9,7 +10,7 @@ local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfil
 local readManifest = require("@root/manifest/readManifest")
 local run = require("@root/lib/run")
 
-local ROOT_PATH = "examples/workspace"
+local ROOT_PATH = path.resolve("examples/workspace")
 local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
 
 local apiKey = process.env.ROBLOX_API_KEY
@@ -19,18 +20,18 @@ local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
-local function appendTextForTesting(path: string, text: string)
-	local handle = fs.open(path, "w+")
+local function appendTextForTesting(filePath: string, text: string)
+	local handle = fs.open(filePath, "w+")
 	local content = fs.read(handle)
 	content ..= text
 	fs.write(handle, content)
 	fs.close(handle)
 end
 
-run("rojo", { "build", `plugin/default.project.json`, "-o", "plugin.rbxm" }, {
+run("rojo", { "build", "plugin/default.project.json", "-o", "plugin.rbxm" }, {
 	cwd = ROOT_PATH,
 })
-run("rojo", { "build", `package/default.project.json`, "-o", "package.rbxm" }, {
+run("rojo", { "build", "package/default.project.json", "-o", "package.rbxm" }, {
 	cwd = ROOT_PATH,
 })
 
@@ -46,8 +47,8 @@ test.case("uploads each workspace member to the Creator Store", function()
 		`{ROOT_PATH}/plugin/src/init.plugin.luau`,
 	}
 
-	for _, path in filesToChange do
-		appendTextForTesting(path, `\nprint("New!")`)
+	for _, filePath in filesToChange do
+		appendTextForTesting(filePath, `\nprint("New!")`)
 	end
 
 	local success, result = pcall(function()
@@ -117,8 +118,8 @@ test.case("only publishes a new version for changed workspace members", function
 
 	-- We make a change to a single workspace member so we can verify that only
 	-- that member was given a new revision after publishing
-	local path = `{ROOT_PATH}/package/src/init.luau`
-	appendTextForTesting(path, `\nprint("New!")`)
+	local filePath = `{ROOT_PATH}/package/src/init.luau`
+	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
 		return run("lute", { "deploy.luau" }, {
@@ -129,7 +130,7 @@ test.case("only publishes a new version for changed workspace members", function
 		})
 	end)
 
-	run("git", { "restore", path })
+	run("git", { "restore", filePath })
 
 	assert(success, result)
 

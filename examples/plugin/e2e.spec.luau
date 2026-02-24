@@ -1,5 +1,6 @@
 local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
+local path = require("@std/path")
 local process = require("@lute/process")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
@@ -9,11 +10,11 @@ local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfil
 local readManifest = require("@root/manifest/readManifest")
 local run = require("@root/lib/run")
 
-local ROOT_PATH = "examples/plugin"
+local ROOT_PATH = path.resolve("examples/plugin")
 local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
 
-local function appendTextForTesting(path: string, text: string)
-	local handle = fs.open(path, "w")
+local function appendTextForTesting(filePath: string, text: string)
+	local handle = fs.open(filePath, "w")
 	local content = fs.read(handle)
 	content ..= text
 	fs.write(handle, content)
@@ -35,8 +36,8 @@ test.case("uploads to the Creator Store", function()
 
 	local prevRevisionId = assetDetails.revisionId
 
-	local path = `{ROOT_PATH}/src/init.plugin.luau`
-	appendTextForTesting(path, `\nprint("New!")`)
+	local filePath = `{ROOT_PATH}/src/init.plugin.luau`
+	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, result = pcall(function()
 		return run("lute", { "deploy.luau" }, {
@@ -47,7 +48,7 @@ test.case("uploads to the Creator Store", function()
 		})
 	end)
 
-	run("git", { "restore", path })
+	run("git", { "restore", filePath })
 
 	assert(success, result)
 

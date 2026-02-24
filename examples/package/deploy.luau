@@ -1,9 +1,8 @@
-local rbxasset = require("@root")
-
+local path = require("@std/path")
 local process = require("@lute/process")
 
-assert(process.cwd():match("examples/package"), "you must be in the `examples/package` folder when running this script")
+local rbxasset = require("@root")
 
-process.system("rojo build -o asset.rbxm")
+process.system(`rojo build -o {path.resolve("./asset.rbxm")}`)
 
-rbxasset.publishPackageAsync(process.cwd(), "package", process.env.ROBLOX_API_KEY)
+rbxasset.publishPackageAsync(path.resolve("."), "package", process.env.ROBLOX_API_KEY)

@@ -1,18 +1,13 @@
-local rbxasset = require("@root")
-
+local path = require("@std/path")
 local process = require("@lute/process")
 
-assert(
-	process.cwd():match("examples/workspace"),
-	"you must be in the `examples/workspace` folder when running this script"
-)
+local rbxasset = require("@root")
 
-process.system("rojo build -o ../package.rbxm", {
-	cwd = "package",
+process.system(`rojo build -o {path.resolve("./package.rbxm")}`, {
+	cwd = path.resolve("./package/"),
+})
+process.system(`rojo build -o {path.resolve("./plugin.rbxm")}`, {
+	cwd = path.resolve("./plugin/"),
 })
 
-process.system("rojo build -o ../plugin.rbxm", {
-	cwd = "plugin",
-})
-
-rbxasset.publishWorkspaceAsync(process.cwd(), process.env.ROBLOX_API_KEY)
+rbxasset.publishWorkspaceAsync(path.resolve("."), process.env.ROBLOX_API_KEY)
