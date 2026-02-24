@@ -16,10 +16,8 @@ local function fetch(url: string, options: FetchOptions)
 
 	logging.debug(`{method} {url}`)
 
-	net.request(url)
-
 	local res = net.request(url, {
-		method = method :: string,
+		method = method,
 		headers = options.headers,
 		body = options.body,
 	})
