@@ -66,3 +66,20 @@ assetId = "123"
 	expect.neq(result.images["icon.png"], nil)
 	expect.eq(result.images["icon.png"].assetId, "123")
 end)
+
+test.case("roundtrips quoted keys", function()
+	local input = {
+		images = {
+			["icon.png"] = {
+				assetId = "123",
+			},
+		},
+	}
+
+	local result = toml.serialize(input)
+
+	local roundtrip = toml.deserialize(result)
+
+	expect.neq(roundtrip.images, nil)
+	expect.neq(roundtrip.images["icon.png"], nil)
+end)

@@ -25,6 +25,16 @@ local function serializeValue(value: string | number)
 	end
 end
 
+-- TOML bare keys may only contain [A-Za-z0-9_-]. Any other key must be quoted.
+local function serializeKey(key: string): string
+	if string.match(key, "^[%w_%-]+$") then
+		return key
+	end
+	key = string.gsub(key, "\\", "\\\\")
+	key = string.gsub(key, '"', '\\"')
+	return '"' .. key .. '"'
+end
+
 local function hasNestedTables(tbl: { [unknown]: unknown })
 	for _, v in tbl do
 		if typeof(v) == "table" and next(v) ~= nil then
@@ -34,7 +44,7 @@ local function hasNestedTables(tbl: { [unknown]: unknown })
 	return false
 end
 
-local function tableToToml(tbl: { [any]: any }, parent: string?)
+local function tableToToml(tbl: { [any]: any }, parent: string?): string
 	local result = ""
 	local subTables = {}
 	local hasDirectValues = false
@@ -43,7 +53,7 @@ local function tableToToml(tbl: { [any]: any }, parent: string?)
 		if typeof(v) == "table" and next(v) ~= nil then
 			if #v > 0 then
 				for _, entry in v do
-					result ..= "\n[[" .. (parent and parent .. "." or "") .. k .. "]]\n"
+					result ..= "\n[[" .. (parent and parent .. "." or "") .. serializeKey(k) .. "]]\n"
 					result ..= tableToToml(entry, nil)
 				end
 			else
@@ -56,7 +66,7 @@ local function tableToToml(tbl: { [any]: any }, parent: string?)
 	end
 
 	for k, v in subTables do
-		local key = parent and (parent .. "." .. k) or k
+		local key = parent and (parent .. "." .. serializeKey(k)) or serializeKey(k)
 
 		if hasNestedTables(v) == true then
 			result ..= tableToToml(v, key)
@@ -98,6 +108,60 @@ local function readLine(state: DeserializerState)
 	return line
 end
 
+-- Splits a TOML key path (e.g. `a."b.c".d`) into its component keys,
+-- honouring both double- and single-quoted segments.
+local function parseKeyPath(path: string): { string }
+	local keys = {}
+	local pos = 1
+
+	while pos <= #path do
+		pos = string.find(path, "[^%s]", pos) or (#path + 1)
+
+		if pos > #path then
+			break
+		end
+
+		local char = string.sub(path, pos, pos)
+
+		if char == '"' or char == "'" then
+			local quote = char
+			local key = ""
+			pos += 1
+
+			while pos <= #path do
+				local c = string.sub(path, pos, pos)
+				if c == "\\" and quote == '"' then
+					pos += 1
+					key ..= string.sub(path, pos, pos)
+				elseif c == quote then
+					pos += 1
+					break
+				else
+					key ..= c
+				end
+				pos += 1
+			end
+
+			table.insert(keys, key)
+		else
+			local dotPos = string.find(path, "%.", pos) or (#path + 1)
+			local key = string.match(string.sub(path, pos, dotPos - 1), "^%s*(.-)%s*$") :: string
+			pos = dotPos
+
+			if key ~= "" then
+				table.insert(keys, key)
+			end
+		end
+
+		pos = string.find(path, "[^%s]", pos) or (#path + 1)
+		if pos <= #path and string.sub(path, pos, pos) == "." then
+			pos += 1
+		end
+	end
+
+	return keys
+end
+
 local function deserialize(input: string)
 	-- Normalize line endings: Replace Windows (\r\n) and old Mac (\r) with Unix (\n)
 	input = string.gsub(input, "\r\n", "\n")
@@ -132,7 +196,7 @@ local function deserialize(input: string)
 			local tablePath = string.match(line, "^%[(.-)%]$")
 			local parent = result
 
-			for section in string.gmatch(tablePath :: string, "([^.]+)") do
+			for _, section in parseKeyPath(tablePath :: string) do
 				if not parent[section] then
 					parent[section] = {}
 				end
