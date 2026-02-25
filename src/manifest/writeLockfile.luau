@@ -11,7 +11,7 @@ type Lockfile = types.Lockfile
 local function writeLockfile(packagePath: path.pathlike, lockfile: Lockfile)
 	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
 	local handle = fs.open(tostring(lockfilePath), "w+")
-	fs.write(handle, toml.serialize(lockfile))
+	fs.write(handle, toml.serialize(lockfile :: { [any]: any }))
 	fs.close(handle)
 
 	logging.debug(`wrote asset lockfile {lockfilePath}`)

@@ -1,6 +1,6 @@
 [tools]
 luau-lsp = { source = "JohnnyMorganz/luau-lsp", version = "=1.62.0" }
-lute = { source = "luau-lang/lute", version = "=0.1.0-nightly.20260224" }
+lute = { source = "luau-lang/lute", version = "=0.1.0-nightly.20260225" }
 rojo = { source = "rojo-rbx/rojo", version = "=7.5.0" }
 selene = { source = "kampfkarren/selene", version = "=0.28.0" }
 stylua = { source = "johnnymorganz/stylua", version = "=2.1.0" }
