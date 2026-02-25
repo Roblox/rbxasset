@@ -67,7 +67,7 @@ assert(apiKey, "argument #1 must be a valid Open Cloud API key")
 -- The rbxm file needs to be built manually. rbxasset makes no assumptions about
 -- how your project is setup, it only cares about having a file to upload. Note
 -- the filename `build.rbxm` matches the `model` field in rbxasset.toml
-process.run("rojo build -o build.rbxm")
+process.system("rojo build -o build.rbxm")
 
 -- Publish the `default` asset defined in rbxasset.toml
 rbxasset.publishPackageAsync(process.cwd(), "default", apiKey)
