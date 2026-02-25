@@ -1,6 +1,4 @@
---!nonstrict
-
--- upstream: https://github.com/luau-lang/lute/blob/fc19ad0b29cd6cae692607995dd6743f229c61b7/batteries/toml.luau
+-- upstream: https://github.com/luau-lang/lute/blob/d3ab7a81840aa62e887d5566fbe66f560b1f3227/batteries/toml.luau
 
 local toml = {}
 
@@ -27,7 +25,7 @@ local function serializeValue(value: string | number)
 	end
 end
 
-local function hasNestedTables(tbl: {})
+local function hasNestedTables(tbl: { [unknown]: unknown })
 	for _, v in tbl do
 		if typeof(v) == "table" and next(v) ~= nil then
 			return true
@@ -36,7 +34,7 @@ local function hasNestedTables(tbl: {})
 	return false
 end
 
-local function tableToToml(tbl: {}, parent: string)
+local function tableToToml(tbl: { [any]: any }, parent: string?)
 	local result = ""
 	local subTables = {}
 	local hasDirectValues = false
@@ -75,7 +73,7 @@ local function tableToToml(tbl: {}, parent: string)
 	return result
 end
 
-local function serialize(tbl: {}): string
+local function serialize(tbl: { [any]: any }): string
 	return tableToToml(tbl, nil)
 end
 
@@ -134,55 +132,7 @@ local function deserialize(input: string)
 			local tablePath = string.match(line, "^%[(.-)%]$")
 			local parent = result
 
-			local sections = {}
-			local pos = 1
-			while pos <= #tablePath do
-				while pos <= #tablePath and string.match(string.sub(tablePath, pos, pos), "%s") do
-					pos = pos + 1
-				end
-
-				if pos > #tablePath then
-					break
-				end
-
-				local char = string.sub(tablePath, pos, pos)
-				if char == '"' or char == "'" then
-					local endPos = pos + 1
-					while endPos <= #tablePath do
-						if string.sub(tablePath, endPos, endPos) == char then
-							local escapeCount = 0
-							local checkPos = endPos - 1
-							while checkPos > pos and string.sub(tablePath, checkPos, checkPos) == "\\" do
-								escapeCount = escapeCount + 1
-								checkPos = checkPos - 1
-							end
-							if escapeCount % 2 == 0 then
-								break
-							end
-						end
-						endPos = endPos + 1
-					end
-					table.insert(sections, string.sub(tablePath, pos + 1, endPos - 1))
-					pos = endPos + 1
-				else
-					local endPos = pos
-					while endPos <= #tablePath and string.sub(tablePath, endPos, endPos) ~= "." do
-						endPos = endPos + 1
-					end
-					local section = string.sub(tablePath, pos, endPos - 1)
-					section = string.match(section, "^%s*(.-)%s*$")
-					if section ~= "" then
-						table.insert(sections, section)
-					end
-					pos = endPos + 1
-				end
-
-				if pos <= #tablePath and string.sub(tablePath, pos, pos) == "." then
-					pos = pos + 1
-				end
-			end
-
-			for _, section in sections do
+			for section in string.gmatch(tablePath :: string, "([^.]+)") do
 				if not parent[section] then
 					parent[section] = {}
 				end
@@ -192,9 +142,12 @@ local function deserialize(input: string)
 			currentTable = parent
 		elseif string.match(line, "^(.-)%s*=%s*(.-)$") then
 			local key, value = string.match(line, "^(.-)%s*=%s*(.-)$")
+			-- selene: allow(incorrect_standard_library_use)
+			assert(key and value)
 			key = string.match(key, "^%s*(.-)%s*$")
 			value = string.match(value, "^%s*(.-)%s*$")
-
+			-- selene: allow(incorrect_standard_library_use)
+			assert(key and value)
 			if string.match(value, '^"(.*)"$') or string.match(value, "^'(.*)'$") then
 				value = string.sub(value, 2, -2)
 				value = string.gsub(value, "\\\\", "\\")
@@ -211,6 +164,7 @@ local function deserialize(input: string)
 			elseif value == "-inf" then
 				value = -math.huge
 			elseif value == "nan" then
+				--lute-lint-ignore(divide_by_zero)
 				value = 0 / 0
 			end
 
