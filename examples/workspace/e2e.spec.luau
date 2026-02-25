@@ -2,7 +2,6 @@ local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
 local path = require("@std/path")
 local process = require("@lute/process")
-local task = require("@lute/task")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 
@@ -10,6 +9,7 @@ local appendTextForTesting = require("@scripts/lib/appendTextForTesting")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
+local retryAsync = require("@scripts/lib/retryAsync")
 local run = require("@root/lib/run")
 
 local ROOT_PATH = path.resolve("examples/workspace")
@@ -24,20 +24,17 @@ local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
 test.case("uploads each workspace member to the Creator Store", function()
-	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	local pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
-
-	local prevPackageRevisionId = packageAssetDetails.revisionId
-	local prevPluginRevisionId = pluginAssetDetails.revisionId
+	local initialAssetDetails = {
+		package = getAssetDetailsAsync(packageAssetId, apiKey),
+		plugin = getAssetDetailsAsync(pluginAssetId, apiKey),
+	}
 
 	local filesToChange = {
 		path.join(ROOT_PATH, "package/src/init.luau"),
 		path.join(ROOT_PATH, "plugin/src/init.plugin.luau"),
 	}
-	local filePathsAsStrings: { string } = {}
 
 	for _, filePath in filesToChange do
-		table.insert(filePathsAsStrings, tostring(filePath))
 		appendTextForTesting(filePath, `\nprint("New!")`)
 	end
 
@@ -48,29 +45,36 @@ test.case("uploads each workspace member to the Creator Store", function()
 		return nil
 	end)
 
-	run("git", { "restore", table.unpack(filePathsAsStrings) })
+	do
+		local filePaths = {}
+		for _, filePath in filesToChange do
+			table.insert(filePaths, tostring(filePath))
+		end
+		run("git", { "restore", table.unpack(filePaths) })
+	end
 
 	assert(success, err)
 
-	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
+	retryAsync(function()
+		local assetDetails = {
+			package = getAssetDetailsAsync(packageAssetId, apiKey),
+			plugin = getAssetDetailsAsync(pluginAssetId, apiKey),
+		}
 
-	expect.neq(packageAssetDetails.revisionId, prevPackageRevisionId)
-	expect.neq(pluginAssetDetails.revisionId, prevPluginRevisionId)
+		expect.neq(assetDetails.package.revisionId, initialAssetDetails.package.revisionId)
+		expect.neq(assetDetails.plugin.revisionId, initialAssetDetails.plugin.revisionId)
+	end)
 end)
 
 test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
-	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	local pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
-
 	local manifest = readManifest(ROOT_PATH)
 
 	local id = os.time()
 
-	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
+	manifest.assets.package.name = `{manifest.assets.package.name} ({id})`
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
-	manifest.assets.plugin.name = `{manifest.assets.plugin.name}\n({id})`
+	manifest.assets.plugin.name = `{manifest.assets.plugin.name} ({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
 	local handle = fs.open(tostring(MANIFEST_PATH), "w")
@@ -88,22 +92,25 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 
 	assert(success, err)
 
-	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
+	retryAsync(function()
+		local assetDetails = {
+			package = getAssetDetailsAsync(packageAssetId, apiKey),
+			plugin = getAssetDetailsAsync(pluginAssetId, apiKey),
+		}
 
-	expect.eq(packageAssetDetails.displayName, manifest.assets.package.name)
-	expect.eq(packageAssetDetails.description, manifest.assets.package.description)
+		expect.eq(assetDetails.package.displayName, manifest.assets.package.name)
+		expect.eq(assetDetails.package.description, manifest.assets.package.description)
 
-	expect.eq(pluginAssetDetails.displayName, manifest.assets.plugin.name)
-	expect.eq(pluginAssetDetails.description, manifest.assets.plugin.description)
+		expect.eq(assetDetails.plugin.displayName, manifest.assets.plugin.name)
+		expect.eq(assetDetails.plugin.description, manifest.assets.plugin.description)
+	end)
 end)
 
 test.case("only publishes a new version for changed workspace members", function()
-	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	local pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
-
-	local prevPackageRevisionId = packageAssetDetails.revisionId
-	local prevPluginRevisionId = pluginAssetDetails.revisionId
+	local initialAssetDetails = {
+		package = getAssetDetailsAsync(packageAssetId, apiKey),
+		plugin = getAssetDetailsAsync(pluginAssetId, apiKey),
+	}
 
 	-- We make a change to a single workspace member so we can verify that only
 	-- that member was given a new revision after publishing
@@ -121,9 +128,11 @@ test.case("only publishes a new version for changed workspace members", function
 
 	assert(success, err)
 
-	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
-	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
+	local assetDetails = {
+		package = getAssetDetailsAsync(packageAssetId, apiKey),
+		plugin = getAssetDetailsAsync(pluginAssetId, apiKey),
+	}
 
-	expect.neq(packageAssetDetails.revisionId, prevPackageRevisionId)
-	expect.eq(pluginAssetDetails.revisionId, prevPluginRevisionId)
+	expect.neq(assetDetails.package.revisionId, initialAssetDetails.package.revisionId)
+	expect.eq(assetDetails.plugin.revisionId, initialAssetDetails.plugin.revisionId)
 end)
