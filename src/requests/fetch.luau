@@ -25,8 +25,6 @@ local function fetch(url: string, options: FetchOptions)
 	if res.ok then
 		return res
 	else
-		-- TODO: This block might need to be revised to work with Lute
-
 		-- FIXME: Narrow the return value of `json.deserialize` instead of
 		-- casting to `any`
 		local body: any = json.deserialize(res.body)

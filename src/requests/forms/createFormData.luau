@@ -1,3 +1,4 @@
+local bufferToHex = require("@root/lib/bufferToHex")
 local crypto = require("@lute/crypto")
 local json = require("@std/json")
 
@@ -31,7 +32,7 @@ local function createFormDataBody(boundary: string, data: { [string]: FormField 
 end
 
 local function createFormData(data: { [string]: FormField })
-	local hash = buffer.tostring(crypto.digest(crypto.hash.md5, tostring(math.random())))
+	local hash = bufferToHex(crypto.digest(crypto.hash.md5, tostring(math.random())))
 
 	local boundary = "LuauFormBoundary" .. hash
 	local body = createFormDataBody(boundary, data)
