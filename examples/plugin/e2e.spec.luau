@@ -15,19 +15,11 @@ local ROOT_PATH = path.resolve("examples/plugin")
 local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
 local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
-local function buildModelFile(): path.path
-	local out = path.join(ROOT_PATH, "plugin.rbxm")
-	process.system(`rojo build -o {out}`)
-	return out
-end
-
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.plugin.assetId
-
-buildModelFile()
 
 test.case("uploads to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)

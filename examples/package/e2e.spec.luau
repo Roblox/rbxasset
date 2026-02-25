@@ -15,12 +15,6 @@ local ROOT_PATH = path.resolve("examples/package")
 local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
 local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
-local function buildModelFile(): path.path
-	local out = path.join(ROOT_PATH, "asset.rbxm")
-	process.system(`rojo build -o {out}`)
-	return out
-end
-
 local apiKey = process.env.ROBLOX_API_KEY
 if not apiKey then
 	error("End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
@@ -29,16 +23,12 @@ end
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-buildModelFile()
-
 test.case("uploads rbxm to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
 	local prevRevisionId = assetDetails.revisionId
 
 	local filePath = path.join(ROOT_PATH, "src/init.luau")
 	appendTextForTesting(filePath, `\nprint("New!")`)
-
-	buildModelFile()
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
