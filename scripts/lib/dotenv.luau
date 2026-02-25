@@ -1,5 +1,7 @@
 local fs = require("@lute/fs")
+local path = require("@std/path")
 local process = require("@lute/process")
+local stdfs = require("@std/fs")
 
 local DOTENV_FILE_NAME = ".env"
 
@@ -8,10 +10,9 @@ local function dotenv()
 	local env: { [string]: string } = {}
 
 	for _, file in fs.listdir(current) do
-		local filePath = `{current}/{file.name}`
+		local filePath = path.join(current, file.name)
 		if file.name == DOTENV_FILE_NAME then
-			local handle = fs.open(filePath, "r")
-			local content = fs.read(handle)
+			local content = stdfs.readfiletostring(filePath)
 
 			for line in content:gmatch("[^\r\n]+") do
 				local key, value = line:match("([%u_]+)[%s+]?=[%s+]?(.*)")

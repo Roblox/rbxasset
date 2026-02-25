@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
-local fs = require("@lute/fs")
 local path = require("@std/path")
 local process = require("@lute/process")
+local stdfs = require("@std/fs")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 
@@ -16,9 +16,7 @@ local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
 local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
 local apiKey = process.env.ROBLOX_API_KEY
-if not apiKey then
-	error("End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
-end
+assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
@@ -56,9 +54,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
-	local handle = fs.open(tostring(MANIFEST_PATH), "w")
-	fs.write(handle, toml.serialize(manifest :: { [any]: any }))
-	fs.close(handle)
+	stdfs.writestringtofile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {

@@ -1,6 +1,6 @@
-local fs = require("@lute/fs")
 local path = require("@std/path")
 local pp = require("@pkg/pp")
+local stdfs = require("@std/fs")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -17,9 +17,7 @@ local function getOrCreateAssetLockfile(packagePath: path.pathlike): Lockfile
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		local handle = fs.open(tostring(lockfilePath))
-		content = fs.read(handle)
-		fs.close(handle)
+		content = stdfs.readfiletostring(lockfilePath)
 	end)
 
 	local parsedLockfile = if success then toml.deserialize(content) else nil

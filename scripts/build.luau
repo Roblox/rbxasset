@@ -1,4 +1,5 @@
 local fs = require("@lute/fs")
+local path = require("@std/path")
 
 local run = require("@root/lib/run")
 
@@ -15,16 +16,16 @@ local INCLUDES = {
 local BUILD_PATH = "build"
 local ARTIFACT_NAME = "rbxasset"
 local ARCHIVE_NAME = "rbxasset.zip"
-local ARTIFACT_PATH = `{BUILD_PATH}/{ARTIFACT_NAME}/`
+local ARTIFACT_PATH = path.join(BUILD_PATH, ARTIFACT_NAME)
 
 run("rm", { "-rf", BUILD_PATH })
-run("mkdir", { "-p", ARTIFACT_PATH })
+run("mkdir", { "-p", tostring(ARTIFACT_PATH) })
 
 for _, includeName in INCLUDES do
 	if fs.type(includeName) == "dir" then
-		run("cp", { "-R", includeName, `{ARTIFACT_PATH}/{includeName}` })
+		run("cp", { "-R", includeName, tostring(path.join(ARTIFACT_PATH, includeName)) })
 	else
-		run("cp", { includeName, ARTIFACT_PATH })
+		run("cp", { includeName, tostring(ARTIFACT_PATH) })
 	end
 end
 

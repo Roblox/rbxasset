@@ -1,5 +1,6 @@
-local fs = require("@lute/fs")
+local path = require("@std/path")
 local process = require("@lute/process")
+local stdfs = require("@std/fs")
 
 local PACKAGES_PATH = "pkg"
 local PACKAGE_INDEX_NAME = "_Index"
@@ -8,14 +9,14 @@ local PACKAGE_INDEX_NAME = "_Index"
 -- depend on them, and it makes it really hard to write install steps
 -- without those functions
 do
-	if fs.exists(PACKAGES_PATH) then
+	if stdfs.exists(PACKAGES_PATH) then
 		process.run({
 			"rm",
 			"-rf",
 			PACKAGES_PATH,
 		})
 	end
-	fs.mkdir(PACKAGES_PATH)
+	stdfs.createdirectory(PACKAGES_PATH)
 
 	local function installLuteBatteries()
 		local commit = "fc19ad0"
@@ -66,18 +67,16 @@ do
 
 			local repoParts = repoPath:split("/")
 			local projectName = repoParts[2]
-			local dest = `{PACKAGES_PATH}/{PACKAGE_INDEX_NAME}/{projectName}`
+			local dest = path.join(PACKAGES_PATH, PACKAGE_INDEX_NAME, projectName)
 
-			run("git", { "clone", `https://github.com/{repoPath}`, dest })
+			run("git", { "clone", `https://github.com/{repoPath}`, tostring(dest) })
 
 			run("git", { "reset", "--hard", rev }, {
-				cwd = dest,
+				cwd = tostring(dest),
 			})
 
-			local linkerPath = `{PACKAGES_PATH}/{projectName}.luau`
-			local handle = fs.open(linkerPath, "w+")
-			fs.write(handle, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
-			fs.close(handle)
+			local linkerPath = path.join(PACKAGES_PATH, `{projectName}.luau`)
+			stdfs.writestringtofile(linkerPath, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
 		end
 	end
 

@@ -1,5 +1,5 @@
-local fs = require("@lute/fs")
 local path = require("@std/path")
+local stdfs = require("@std/fs")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -10,10 +10,7 @@ type Lockfile = types.Lockfile
 
 local function writeLockfile(packagePath: path.pathlike, lockfile: Lockfile)
 	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
-	local handle = fs.open(tostring(lockfilePath), "w+")
-	fs.write(handle, toml.serialize(lockfile :: { [any]: any }))
-	fs.close(handle)
-
+	stdfs.writestringtofile(lockfilePath, toml.serialize(lockfile :: { [unknown]: unknown }))
 	logging.debug(`wrote asset lockfile {lockfilePath}`)
 end
 
