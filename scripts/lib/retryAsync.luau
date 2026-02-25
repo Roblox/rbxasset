@@ -17,8 +17,11 @@ local function retry(callback: () -> (), retryOptions: RetryOptions?)
 	local options = tableext.combine(defaultOptions, retryOptions) :: Options
 
 	local attempts = 0
+	local start = os.clock()
 
 	while true do
+		attempts += 1
+
 		local success, err = pcall(function()
 			callback()
 			return nil
@@ -28,13 +31,16 @@ local function retry(callback: () -> (), retryOptions: RetryOptions?)
 			break
 		end
 
-		attempts += 1
-
 		if attempts >= options.maxAttempts then
-			error(`callback did not succeed in {options.maxAttempts} attempts: {err}`)
+			local elapsed = ("%.2f"):format(os.clock() - start)
+			error(`callback did not succeed over {options.maxAttempts} attempts in {elapsed} seconds: {err}`, 2)
 		end
 
-		task.wait(options.waitTime)
+		local waitTime = options.waitTime
+		if attempts > 1 then
+			waitTime *= 2 * attempts
+		end
+		task.wait(waitTime)
 	end
 end
 
