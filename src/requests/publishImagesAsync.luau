@@ -1,3 +1,4 @@
+local bufferToHex = require("@root/lib/bufferToHex")
 local crypto = require("@lute/crypto")
 local fs = require("@lute/fs")
 local path = require("@std/path")
@@ -18,7 +19,7 @@ type PendingImage = {
 }
 
 local function toSha256String(str: string): string
-	return buffer.tostring(crypto.digest(crypto.hash.sha256, str))
+	return bufferToHex(crypto.digest(crypto.hash.sha256, str))
 end
 
 local function publishImagesAsync(
@@ -78,8 +79,8 @@ local function publishImagesAsync(
 		logging.info("syncing package thumbnails...")
 
 		for index, thumbnailFilename in thumbnails do
-			local thumbnailPath = `{projectPath}/{thumbnailFilename}`
-			local thumbnailHandle = fs.open(thumbnailPath, "r")
+			local thumbnailPath = path.join(projectPath, thumbnailFilename)
+			local thumbnailHandle = fs.open(tostring(thumbnailPath), "r")
 			local thumbnailContent = fs.read(thumbnailHandle)
 			fs.close(thumbnailHandle)
 
@@ -125,7 +126,7 @@ local function publishImagesAsync(
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
-			local pendingImageHandle = fs.open(pendingImage.path)
+			local pendingImageHandle = fs.open(tostring(pendingImage.path))
 			local pendingImageContent = fs.read(pendingImageHandle)
 			fs.close(pendingImageHandle)
 
