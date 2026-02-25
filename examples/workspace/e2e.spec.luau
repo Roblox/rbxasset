@@ -1,11 +1,11 @@
 local expect = require("@std/test/assert")
 local fs = require("@lute/fs")
-
 local path = require("@std/path")
 local process = require("@lute/process")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 
+local appendTextForTesting = require("@scripts/lib/appendTextForTesting")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
@@ -22,16 +22,24 @@ local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local packageAssetId = lockfile.assets.package.assetId
 local pluginAssetId = lockfile.assets.plugin.assetId
 
-local function appendTextForTesting(filePath: path.pathlike, text: string)
-	local handle = fs.open(tostring(filePath), "w+")
-	local content = fs.read(handle)
-	content ..= text
-	fs.write(handle, content)
-	fs.close(handle)
+local function buildPluginModelFile(): path.path
+	local out = path.join(ROOT_PATH, "plugin.rbxm")
+	process.system(`rojo build plugin/ -o {out}`)
+	return out
 end
 
-process.system(`rojo build plugin/default.project.json -o {path.join(ROOT_PATH, "plugin.rbxm")}`)
-process.system(`rojo build package/default.project.json -o {path.join(ROOT_PATH, "package.rbxm")}`)
+local function buildPackageModelFile(): path.path
+	local out = path.join(ROOT_PATH, "package.rbxm")
+	process.system(`rojo build package/ -o {out}`)
+	return out
+end
+
+local function buildModelFiles()
+	buildPluginModelFile()
+	buildPackageModelFile()
+end
+
+buildModelFiles()
 
 test.case("uploads each workspace member to the Creator Store", function()
 	local packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
@@ -50,6 +58,8 @@ test.case("uploads each workspace member to the Creator Store", function()
 		table.insert(filePathsAsStrings, tostring(filePath))
 		appendTextForTesting(filePath, `\nprint("New!")`)
 	end
+
+	buildModelFiles()
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {

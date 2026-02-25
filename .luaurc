@@ -5,6 +5,7 @@
     "std": "~/.lute/typedefs/0.1.0/std/",
     "pkg": "pkg",
     "root": "src",
+    "scripts": "scripts",
     "examples": "examples"
   }
 }

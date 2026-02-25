@@ -5,6 +5,7 @@ local process = require("@lute/process")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 
+local appendTextForTesting = require("@scripts/lib/appendTextForTesting")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
@@ -14,12 +15,10 @@ local ROOT_PATH = path.resolve("examples/package")
 local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
 local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
-local function appendTextForTesting(filePath: path.pathlike, text: string)
-	local handle = fs.open(tostring(filePath), "w+")
-	local content = fs.read(handle)
-	content ..= text
-	fs.write(handle, content)
-	fs.close(handle)
+local function buildModelFile(): path.path
+	local out = path.join(ROOT_PATH, "asset.rbxm")
+	process.system(`rojo build -o {out}`)
+	return out
 end
 
 local apiKey = process.env.ROBLOX_API_KEY
@@ -30,7 +29,7 @@ end
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-process.system(`rojo build -o {path.join(ROOT_PATH, "asset.rbxm")}`)
+buildModelFile()
 
 test.case("uploads rbxm to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
@@ -38,6 +37,8 @@ test.case("uploads rbxm to the Creator Store", function()
 
 	local filePath = path.join(ROOT_PATH, "src/init.luau")
 	appendTextForTesting(filePath, `\nprint("New!")`)
+
+	buildModelFile()
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
@@ -87,7 +88,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	expect.neq(assetDetails.revisionId, prevRevisionId)
 end)
 
-test.case("does not publish a new version when there are no changes", function()
+test.case("only publishes a new version when there are new changes", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
 	local prevRevisionId = assetDetails.revisionId
