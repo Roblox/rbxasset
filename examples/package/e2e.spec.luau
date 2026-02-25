@@ -39,15 +39,16 @@ test.case("uploads rbxm to the Creator Store", function()
 	local filePath = path.join(ROOT_PATH, "src/init.luau")
 	appendTextForTesting(filePath, `\nprint("New!")`)
 
-	local success, result = pcall(function()
-		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
 			stdio = "inherit",
 		})
+		return nil
 	end)
 
 	run("git", { "restore", tostring(filePath) })
 
-	assert(success, result)
+	assert(success, err)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
@@ -65,18 +66,19 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
 	local handle = fs.open(tostring(MANIFEST_PATH), "w")
-	fs.write(handle, toml.serialize(manifest))
+	fs.write(handle, toml.serialize(manifest :: { [any]: any }))
 	fs.close(handle)
 
-	local success, result = pcall(function()
-		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
 			stdio = "inherit",
 		})
+		return nil
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
 
-	assert(success, result)
+	assert(success, err)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 

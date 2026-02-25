@@ -51,15 +51,16 @@ test.case("uploads each workspace member to the Creator Store", function()
 		appendTextForTesting(filePath, `\nprint("New!")`)
 	end
 
-	local success, result = pcall(function()
-		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
 			stdio = "inherit",
 		})
+		return nil
 	end)
 
 	run("git", { "restore", table.unpack(filePathsAsStrings) })
 
-	assert(success, result)
+	assert(success, err)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
@@ -83,18 +84,19 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
 	local handle = fs.open(tostring(MANIFEST_PATH), "w")
-	fs.write(handle, toml.serialize(manifest))
+	fs.write(handle, toml.serialize(manifest :: { [any]: any }))
 	fs.close(handle)
 
-	local success, result = pcall(function()
-		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
 			stdio = "inherit",
 		})
+		return nil
 	end)
 
 	run("git", { "restore", tostring(MANIFEST_PATH) })
 
-	assert(success, result)
+	assert(success, err)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
@@ -118,15 +120,16 @@ test.case("only publishes a new version for changed workspace members", function
 	local filePath = path.join(ROOT_PATH, "package/src/init.luau")
 	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
 
-	local success, result = pcall(function()
-		return process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
 			stdio = "inherit",
 		})
+		return nil
 	end)
 
 	run("git", { "restore", tostring(filePath) })
 
-	assert(success, result)
+	assert(success, err)
 
 	packageAssetDetails = getAssetDetailsAsync(packageAssetId, apiKey)
 	pluginAssetDetails = getAssetDetailsAsync(pluginAssetId, apiKey)
