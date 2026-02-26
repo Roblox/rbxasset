@@ -1,5 +1,5 @@
 local json = require("@std/json")
-local net = require("@lute/net")
+local net = require("@std/net")
 
 local logging = require("@root/logging")
 

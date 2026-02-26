@@ -1,5 +1,5 @@
 local path = require("@std/path")
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local logging = require("@root/logging")
 local publishAssetAsync = require("@root/requests/publishAssetAsync")

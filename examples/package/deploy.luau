@@ -1,5 +1,5 @@
 local path = require("@std/path")
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local rbxasset = require("@root")
 

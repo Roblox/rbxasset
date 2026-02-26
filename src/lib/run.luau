@@ -1,4 +1,4 @@
-local process = require("@lute/process")
+local process = require("@std/process")
 local richterm = require("@pkg/richterm")
 
 type Options = {

@@ -1,5 +1,5 @@
 local cli = require("@pkg/cli")
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local dotenv = require("./lib/dotenv")
 local run = require("@root/lib/run")

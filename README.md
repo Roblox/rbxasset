@@ -55,7 +55,7 @@ Then create a Luau script to handle the deployment:
 
 ```luau
 -- scripts/publish.luau
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local rbxasset = require("./path/to/rbxasset")
 

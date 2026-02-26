@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
 local fs = require("@std/fs")
 local path = require("@std/path")
-local process = require("@lute/process")
+local process = require("@std/process")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 

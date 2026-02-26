@@ -1,6 +1,6 @@
 local fs = require("@std/fs")
 local path = require("@std/path")
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local PACKAGES_PATH = "pkg"
 local PACKAGE_INDEX_NAME = "_Index"
