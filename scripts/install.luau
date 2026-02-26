@@ -9,13 +9,7 @@ local PACKAGE_INDEX_NAME = "_Index"
 -- depend on them, and it makes it really hard to write install steps
 -- without those functions
 do
-	if stdfs.exists(PACKAGES_PATH) then
-		process.run({
-			"rm",
-			"-rf",
-			PACKAGES_PATH,
-		})
-	end
+	stdfs.removedirectory(PACKAGES_PATH, { recursive = true })
 	stdfs.createdirectory(PACKAGES_PATH)
 
 	local function installLuteBatteries()

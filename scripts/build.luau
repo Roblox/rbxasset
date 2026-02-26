@@ -1,4 +1,4 @@
-local fs = require("@lute/fs")
+local fs = require("@std/fs")
 local path = require("@std/path")
 
 local run = require("@root/lib/run")
@@ -18,8 +18,12 @@ local ARTIFACT_NAME = "rbxasset"
 local ARCHIVE_NAME = "rbxasset.zip"
 local ARTIFACT_PATH = path.join(BUILD_PATH, ARTIFACT_NAME)
 
-run("rm", { "-rf", BUILD_PATH })
-run("mkdir", { "-p", tostring(ARTIFACT_PATH) })
+fs.removedirectory(BUILD_PATH, {
+	recursive = true,
+})
+fs.createdirectory(ARTIFACT_PATH, {
+	makeparents = true,
+})
 
 for _, includeName in INCLUDES do
 	if fs.type(includeName) == "dir" then
