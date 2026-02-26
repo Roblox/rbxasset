@@ -3,5 +3,5 @@
     "LuauSolverV2": "true"
   },
   "luau-lsp.platform.type": "standard",
-  "luau-lsp.ignoreGlobs": ["**/pkg/**"]
+  "luau-lsp.ignoreGlobs": ["**/pkg/**", "**/.lute/**"]
 }
