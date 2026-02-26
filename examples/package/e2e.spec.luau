@@ -1,7 +1,7 @@
 local expect = require("@std/test/assert")
+local fs = require("@std/fs")
 local path = require("@std/path")
 local process = require("@lute/process")
-local stdfs = require("@std/fs")
 local test = require("@std/test")
 local toml = require("@root/lib/toml")
 
@@ -54,7 +54,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
-	stdfs.writestringtofile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
+	fs.writestringtofile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {

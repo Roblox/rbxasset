@@ -1,6 +1,6 @@
+local fs = require("@std/fs")
 local path = require("@std/path")
 local pp = require("@pkg/pp")
-local stdfs = require("@std/fs")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -12,7 +12,7 @@ type Manifest = types.Manifest
 local function readManifest(packagePath: path.pathlike): Manifest
 	local manifestPath = path.join(packagePath, constants.ASSET_MANIFEST_FILENAME)
 	local success, result = pcall(function()
-		return stdfs.readfiletostring(manifestPath)
+		return fs.readfiletostring(manifestPath)
 	end)
 	assert(success, `failed to read asset manifest at {manifestPath}: {result}`)
 

@@ -1,6 +1,6 @@
+local fs = require("@std/fs")
 local json = require("@std/json")
 local path = require("@std/path")
-local stdfs = require("@std/fs")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -36,7 +36,7 @@ local function publishAssetAsync(
 	local assetId
 
 	local modelPath = path.join(projectPath, asset.model)
-	local modelContent = stdfs.readfiletostring(modelPath)
+	local modelContent = fs.readfiletostring(modelPath)
 
 	if assetDetails and assetDetails.assetId then
 		logging.info("publishing new version...")

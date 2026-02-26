@@ -1,6 +1,6 @@
+local fs = require("@std/fs")
 local path = require("@std/path")
 local process = require("@lute/process")
-local stdfs = require("@std/fs")
 
 local PACKAGES_PATH = "pkg"
 local PACKAGE_INDEX_NAME = "_Index"
@@ -9,8 +9,8 @@ local PACKAGE_INDEX_NAME = "_Index"
 -- depend on them, and it makes it really hard to write install steps
 -- without those functions
 do
-	stdfs.removedirectory(PACKAGES_PATH, { recursive = true })
-	stdfs.createdirectory(PACKAGES_PATH)
+	fs.removedirectory(PACKAGES_PATH, { recursive = true })
+	fs.createdirectory(PACKAGES_PATH)
 
 	local function installLuteBatteries()
 		local commit = "fc19ad0"
@@ -70,7 +70,7 @@ do
 			})
 
 			local linkerPath = path.join(PACKAGES_PATH, `{projectName}.luau`)
-			stdfs.writestringtofile(linkerPath, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
+			fs.writestringtofile(linkerPath, `return require("./{PACKAGE_INDEX_NAME}/{projectName}/{repo.main}")`)
 		end
 	end
 

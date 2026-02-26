@@ -1,6 +1,6 @@
+local fs = require("@std/fs")
 local json = require("@std/json")
 local path = require("@std/path")
-local stdfs = require("@std/fs")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -16,7 +16,7 @@ local function createImageAsync(
 )
 	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
 
-	local imageContent = stdfs.readfiletostring(imagePath)
+	local imageContent = fs.readfiletostring(imagePath)
 
 	local formData = createFormData({
 		request = {

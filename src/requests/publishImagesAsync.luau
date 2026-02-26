@@ -1,7 +1,7 @@
 local bufferToHex = require("@root/lib/bufferToHex")
 local crypto = require("@lute/crypto")
+local fs = require("@std/fs")
 local path = require("@std/path")
-local stdfs = require("@std/fs")
 
 local createImageAsync = require("@root/requests/createImageAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
@@ -36,7 +36,7 @@ local function publishImagesAsync(
 	local icon = assetConfig.icon
 	if icon then
 		local iconPath = path.join(projectPath, icon)
-		local iconContent = stdfs.readfiletostring(iconPath)
+		local iconContent = fs.readfiletostring(iconPath)
 
 		logging.info(`syncing package icon at {iconPath}`)
 
@@ -78,7 +78,7 @@ local function publishImagesAsync(
 
 		for index, thumbnailFilename in thumbnails do
 			local thumbnailPath = path.join(projectPath, thumbnailFilename)
-			local thumbnailContent = stdfs.readfiletostring(thumbnailPath)
+			local thumbnailContent = fs.readfiletostring(thumbnailPath)
 			local thumbnailHash = toSha256String(thumbnailContent)
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
@@ -121,7 +121,7 @@ local function publishImagesAsync(
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
-			local pendingImageContent = stdfs.readfiletostring(pendingImage.path)
+			local pendingImageContent = fs.readfiletostring(pendingImage.path)
 
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,
