@@ -1,3 +1,4 @@
+local pp = require("@pkg/pp")
 local tableext = require("@std/tableext")
 local task = require("@lute/task")
 
@@ -33,7 +34,7 @@ local function retry(callback: () -> (), retryOptions: RetryOptions?)
 
 		if attempts >= options.maxAttempts then
 			local elapsed = ("%.2f"):format(os.clock() - start)
-			error(`callback did not succeed over {options.maxAttempts} attempts in {elapsed} seconds: {err}`, 2)
+			error(`callback did not succeed over {options.maxAttempts} attempts in {elapsed} seconds: {pp(err)}`, 2)
 		end
 
 		local waitTime = options.waitTime
