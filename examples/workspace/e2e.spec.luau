@@ -113,7 +113,7 @@ test.case("only publishes a new version for changed workspace members", function
 	-- We make a change to a single workspace member so we can verify that only
 	-- that member was given a new revision after publishing
 	local filePath = path.join(ROOT_PATH, "package/src/init.luau")
-	appendTextForTesting(tostring(filePath), `\nprint("New!")`)
+	appendTextForTesting(filePath, `\nprint("New!")`)
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
