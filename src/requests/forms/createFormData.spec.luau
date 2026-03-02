@@ -1,6 +1,5 @@
-local frktest = require("@pkg/frktest")
-local test = frktest.test
-local check = frktest.assert.check
+local expect = require("@std/test/assert")
+local test = require("@std/test")
 
 local createFormData = require("./createFormData")
 
@@ -10,7 +9,7 @@ local function assertStringsMatch(base: string, expected: string)
 		table.insert(baseLines, line)
 	end
 
-	local expectedLines = {}
+	local expectedLines: { string } = {}
 	for line in expected:gmatch("[^\r\n]+") do
 		table.insert(expectedLines, line)
 	end
@@ -18,6 +17,7 @@ local function assertStringsMatch(base: string, expected: string)
 	for index, baseLine in baseLines do
 		local expectedLine = expectedLines[index]
 		if baseLine ~= expectedLine then
+			print(baseLine, expectedLine)
 			error(`strings do not match at line {index}\n- base: "{baseLine}"\n- expected: "{expectedLine}"`, 2)
 		end
 	end
@@ -34,9 +34,9 @@ test.case("automatically converts objects to json", function()
 		},
 	})
 
-	local match = formData.body:match('{"bar":true,"baz":"str"}')
+	local match = formData.body:match('{ "baz": "str",  "bar": true}')
 
-	check.not_nil(match)
+	expect.neq(match, nil)
 end)
 
 test.case("body supports multiple parts", function()
@@ -64,7 +64,7 @@ test.case("body supports multiple parts", function()
 		`Content-Disposition: form-data; name="request"`,
 		"Content-Type: application/json",
 		"",
-		'{"assetType":"Image","creationContext":{"creator":{"userId":12345678}},"displayName":"Display Name"}',
+		'{ "creationContext": { "creator": { "userId": 12345678 } },  "assetType": "Image",  "displayName": "Display Name"}',
 		`--{formData.boundary}`,
 		"",
 		'Content-Disposition: form-data; name="fileContent"',
@@ -84,6 +84,8 @@ test.case("the boundary contains LuauFormBoundary", function()
 			contentType = "text/plain",
 		},
 	})
+
 	local match = formData.boundary:match("LuauFormBoundary")
-	check.not_nil(match)
+
+	expect.neq(match, nil)
 end)

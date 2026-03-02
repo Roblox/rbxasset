@@ -1,5 +1,7 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local bufferToHex = require("@root/lib/bufferToHex")
+local crypto = require("@lute/crypto")
+local fs = require("@std/fs")
+local path = require("@std/path")
 
 local createImageAsync = require("@root/requests/createImageAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
@@ -11,13 +13,17 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 type PendingImage = {
-	path: string,
+	path: path.pathlike,
 	filename: string,
 	assetId: string,
 }
 
+local function toSha256String(str: string): string
+	return bufferToHex(crypto.digest(crypto.hash.sha256, str))
+end
+
 local function publishImagesAsync(
-	projectPath: string,
+	projectPath: path.pathlike,
 	assetConfig: AssetConfig,
 	environment: EnvironmentConfig,
 	apiKey: string
@@ -29,11 +35,12 @@ local function publishImagesAsync(
 
 	local icon = assetConfig.icon
 	if icon then
-		local iconPath = `{projectPath}/{icon}`
+		local iconPath = path.join(projectPath, icon)
+		local iconContent = fs.readfiletostring(iconPath)
 
 		logging.info(`syncing package icon at {iconPath}`)
 
-		local iconHash = serde.hash("sha256", fs.readFile(iconPath))
+		local iconHash = toSha256String(iconContent)
 
 		if existingImages and existingImages[icon] and existingImages[icon].hash == iconHash then
 			logging.debug(`hashes match for {iconPath}, skipping...`)
@@ -51,11 +58,12 @@ local function publishImagesAsync(
 			local assetId = if operation.response then operation.response.assetId else nil
 
 			if assetId then
-				table.insert(pendingImages, {
+				local pendingImage: PendingImage = {
 					path = iconPath,
 					filename = icon,
 					assetId = assetId,
-				})
+				}
+				table.insert(pendingImages, pendingImage)
 
 				logging.debug(`image uploaded successfully`)
 			else
@@ -69,8 +77,9 @@ local function publishImagesAsync(
 		logging.info("syncing package thumbnails...")
 
 		for index, thumbnailFilename in thumbnails do
-			local thumbnailPath = `{projectPath}/{thumbnailFilename}`
-			local thumbnailHash = serde.hash("sha256", fs.readFile(thumbnailPath))
+			local thumbnailPath = path.join(projectPath, thumbnailFilename)
+			local thumbnailContent = fs.readfiletostring(thumbnailPath)
+			local thumbnailHash = toSha256String(thumbnailContent)
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
 			if existingThumbnail and existingThumbnail.hash == thumbnailHash then
@@ -92,11 +101,12 @@ local function publishImagesAsync(
 				local assetId = operation.response.assetId
 
 				if assetId then
-					table.insert(pendingImages, {
+					local pendingImage: PendingImage = {
 						path = thumbnailPath,
 						filename = thumbnailFilename,
 						assetId = assetId,
-					})
+					}
+					table.insert(pendingImages, pendingImage)
 
 					logging.debug(`image uploaded successfully`)
 				else
@@ -107,13 +117,15 @@ local function publishImagesAsync(
 	end
 
 	if #pendingImages > 0 then
-		local newAssetLockfile = table.clone(assetLockfile or {})
+		local newAssetLockfile = table.clone(assetLockfile or {} :: types.Lockfile)
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
+			local pendingImageContent = fs.readfiletostring(pendingImage.path)
+
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,
-				hash = serde.hash("sha256", fs.readFile(pendingImage.path)),
+				hash = toSha256String(pendingImageContent),
 			}
 
 			logging.debug(

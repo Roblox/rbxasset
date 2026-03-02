@@ -1,4 +1,5 @@
-local process = require("@lune/process")
+local path = require("@std/path")
+local process = require("@std/process")
 
 local logging = require("@root/logging")
 local publishAssetAsync = require("@root/requests/publishAssetAsync")
@@ -6,7 +7,7 @@ local publishImagesAsync = require("@root/requests/publishImagesAsync")
 local readManifest = require("@root/manifest/readManifest")
 local setAssetIconAsync = require("@root/requests/setAssetIconAsync")
 
-local function publishPackageAsync(projectPath: string, assetName: string, apiKey: string)
+local function publishPackageAsync(projectPath: path.pathlike, assetName: string, apiKey: string)
 	local manifest = readManifest(projectPath)
 
 	local asset = manifest.assets[assetName]

@@ -1,5 +1,7 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@std/fs")
+local path = require("@std/path")
+local pp = require("@pkg/pp")
+local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
 local join = require("@root/lib/join")
@@ -8,26 +10,26 @@ local types = require("@root/types")
 
 type Lockfile = types.Lockfile
 
-local function getOrCreateAssetLockfile(packagePath: string): Lockfile
-	local lockfilePath = `{packagePath}/{constants.ASSET_LOCKFILE_FILENAME}`
+local function getOrCreateAssetLockfile(packagePath: path.pathlike): Lockfile
+	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
 
 	-- It's expected that the lockfile won't exist in certain situations, like
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		content = fs.readFile(lockfilePath)
+		content = fs.readfiletostring(lockfilePath)
 	end)
 
-	local parsedLockfile = if success then serde.decode("toml", content) else nil
-	local lockfile: Lockfile = join({
+	local parsedLockfile = if success then toml.deserialize(content) else nil
+	local lockfile = join({
 		assets = {},
 		images = {},
-	}, parsedLockfile)
+	}, parsedLockfile) :: Lockfile
 
 	local isLockfileValid, message = types.validateLockfile(lockfile)
 	assert(isLockfileValid, `failed to parse asset lockfile at {lockfilePath}: {message}`)
 
-	logging.debug(`loaded asset lockfile {lockfile}`)
+	logging.debug(`loaded asset lockfile {pp(lockfile)}`)
 
 	return lockfile
 end

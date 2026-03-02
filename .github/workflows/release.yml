@@ -23,10 +23,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute scripts/install.luau
 
       - name: Build
-        run: lune run build
+        run: lute scripts/build.luau
 
       - uses: actions/upload-artifact@v4
         with:

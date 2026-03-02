@@ -1,5 +1,5 @@
-local net = require("@lune/net")
-local serde = require("@lune/serde")
+local json = require("@std/json")
+local net = require("@std/net")
 
 local logging = require("@root/logging")
 
@@ -16,8 +16,7 @@ local function fetch(url: string, options: FetchOptions)
 
 	logging.debug(`{method} {url}`)
 
-	local res = net.request({
-		url = url,
+	local res = net.request(url, {
 		method = method,
 		headers = options.headers,
 		body = options.body,
@@ -26,19 +25,21 @@ local function fetch(url: string, options: FetchOptions)
 	if res.ok then
 		return res
 	else
-		local body = serde.decode("json", res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of
+		-- casting to `any`
+		local body: any = json.deserialize(res.body)
 
-		local problems = {}
+		local problems: { string } = {}
 		if body.errors then
 			for _, err in body.errors do
-				table.insert(problems, err.message)
+				table.insert(problems, err.message :: string)
 			end
 		elseif body.message then
-			table.insert(problems, body.message)
+			table.insert(problems, body.message :: string)
 		end
 
 		error(
-			`{res.statusCode} {res.statusMessage} when attempting to {method} {url}`
+			`{res.status} {res.body} when attempting to {method} {url}`
 				.. if #problems > 0 then `: {table.concat(problems, ", ")}` else "",
 			2
 		)

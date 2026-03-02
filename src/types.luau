@@ -1,8 +1,8 @@
-local t = require("@pkg/t")
+local t: any = require("@pkg/t")
 
 local types = {}
 
-local function countObject(obj: { [any]: any }): number
+local function countObject(obj: { [unknown]: unknown }): number
 	local count = 0
 	for _ in obj do
 		count += 1
@@ -174,5 +174,21 @@ export type OperationResponse = {
 		},
 	}?,
 } & ErrorStatusResponse
+
+export type LuauTaskResponse = {
+	binaryInput: string,
+	binaryOutputUri: string,
+	createTime: string,
+	enableBinaryOutput: boolean,
+	output: {
+		results: { any },
+	},
+	path: string,
+	script: string,
+	state: string,
+	updateTime: string,
+	user: string,
+	error: { [string]: any }?,
+}
 
 return types

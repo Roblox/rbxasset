@@ -1,9 +1,9 @@
 local run = require("@root/lib/run")
 
 local foldersToLint = {
-	".lune",
-	"src",
 	"examples",
+	"scripts",
+	"src",
 }
 
 run("selene", foldersToLint)
