@@ -1,12 +1,14 @@
 local process = require("@std/process")
 
-local check = require("@self/check")
+local check = require("@self/commands/check")
+local publish = require("@self/commands/publish")
 local types = require("@self/types")
 
 local ARGS = { ... }
 
 local SUBCOMMANDS: { [string]: types.Subcommand } = {
 	check = check,
+	publish = publish,
 }
 
 local function getPossibleSubcommands()
@@ -18,7 +20,7 @@ local function getPossibleSubcommands()
 end
 
 --[[
-	Lute CLI battery doesn't support subcommands yet, so to work around that
+	Lute's CLI battery doesn't support subcommands yet, so to work around that
 	each of our subcommands is a new Parser instance, and this top-level
 	interface just routes to each subcommand.
 ]]

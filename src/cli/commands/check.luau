@@ -4,8 +4,9 @@ local path = require("@std/path")
 local process = require("@std/process")
 
 local constants = require("@root/constants")
+local parseProjectPath = require("@root/cli/parsers/parseProjectPath")
 local readManifest = require("@root/manifest/readManifest")
-local types = require("./types")
+local types = require("@root/cli/types")
 
 local ASSET_MANIFEST_FILENAME = constants.ASSET_MANIFEST_FILENAME
 
@@ -19,9 +20,7 @@ args:add("project-path", "option", {
 local command: types.Subcommand = {
 	parser = args,
 	run = function()
-		local userProjectPathPath = args:get("project-path")
-
-		local projectPath = if userProjectPathPath then path.resolve(userProjectPathPath) else process.cwd()
+		local projectPath = parseProjectPath(args, "project-path")
 		local manifestPath = path.join(projectPath, ASSET_MANIFEST_FILENAME)
 
 		if not fs.exists(projectPath) then
