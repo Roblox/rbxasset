@@ -1,11 +1,13 @@
-local path = require("@std/path")
 local process = require("@std/process")
 
+local check = require("@self/check")
 local types = require("@self/types")
 
 local ARGS = { ... }
 
-local SUBCOMMANDS: { [string]: types.Subcommand } = {}
+local SUBCOMMANDS: { [string]: types.Subcommand } = {
+	check = check,
+}
 
 local function getPossibleSubcommands()
 	local names = {}
@@ -15,33 +17,30 @@ local function getPossibleSubcommands()
 	return table.concat(names, ", ")
 end
 
-do
-	--[[
-		Lute CLI battery doesn't support subcommands yet, so to work around that
-		each of our subcommands is a new Parser instance, and this top-level
-		interface just routes to each subcommand.
-	]]
+--[[
+	Lute CLI battery doesn't support subcommands yet, so to work around that
+	each of our subcommands is a new Parser instance, and this top-level
+	interface just routes to each subcommand.
+]]
 
-	local scriptPath = path.resolve(ARGS[1])
-	local subcommandName = ARGS[2]
-	local remainingArgs = table.unpack(ARGS, 2, #ARGS)
-	local userArgs = { scriptPath, remainingArgs }
+local scriptPath = ARGS[1]
+local subcommandName = ARGS[2]
+local userArgs = { scriptPath, table.unpack(ARGS, 2, #ARGS) }
 
-	local subcommand = rawget(SUBCOMMANDS, subcommandName)
+local subcommand = rawget(SUBCOMMANDS, subcommandName)
 
-	if subcommand then
-		subcommand.parser:parse(table.unpack(userArgs))
-		subcommand.run()
-	else
-		local message = {
-			`No command named {subcommandName}`,
-			`Possible subcommands: {getPossibleSubcommands()}`,
-			"Usage:",
-			"  rbxasset <subcommand> [...options]",
-		}
-		print(table.concat(message, "\n"))
+if subcommand then
+	subcommand.parser:parse(userArgs)
+	subcommand.run()
+else
+	local message = {
+		`No command named {subcommandName}`,
+		`Possible subcommands: {getPossibleSubcommands()}`,
+		"Usage:",
+		"  rbxasset <subcommand> [...options]",
+	}
+	print(table.concat(message, "\n"))
 
-		process.exit(1)
-		return
-	end
+	process.exit(1)
+	return
 end
