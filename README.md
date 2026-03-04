@@ -24,8 +24,8 @@ Run the following commands to clone the repo, install dependencies, and build rb
 git clone https://github.com/Roblox/rbxasset.git
 cd rbxasset
 foreman install
-lute scripts/install.luau
-lute scripts/build.luau
+lute run install
+lute run build
 ```
 
 From there, drag and drop `build/rbxasset` to a place where you will require it via a Luau script.
@@ -74,7 +74,7 @@ rbxasset.publishPackageAsync(process.cwd(), "default", apiKey)
 ```
 
 ```sh
-$ lute scripts/publish.luau <API_KEY>
+$ lute run scripts/publish.luau <API_KEY>
 ```
 
 Where `<API_KEY>` represents an Open Cloud API key that has the following scopes:

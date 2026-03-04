@@ -8,6 +8,6 @@
     "examples": "./examples",
     "pkg": "./pkg",
     "root": "./src",
-    "scripts": "./scripts"
+    "scripts": "./.lute"
   }
 }
