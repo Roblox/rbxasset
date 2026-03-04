@@ -5,6 +5,6 @@ run("luau-lsp", {
 	"--settings=.vscode/settings.json",
 
 	"examples",
-	"scripts",
+	".lute",
 	"src",
 })
