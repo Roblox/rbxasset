@@ -2,9 +2,9 @@ local fs = require("@std/fs")
 local path = require("@std/path")
 
 local function appendTextForTesting(filePath: path.pathlike, text: string)
-	local content = fs.readfiletostring(tostring(filePath))
-	content ..= text
-	fs.writestringtofile(tostring(filePath), content)
+	local handle = fs.open(filePath, "a+")
+	fs.write(handle, text)
+	fs.close(handle)
 end
 
 return appendTextForTesting
