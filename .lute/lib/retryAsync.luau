@@ -12,7 +12,7 @@ local defaultOptions = {
 	waitTime = 1,
 }
 
-type Options = typeof(defaultOptions) & RetryOptions
+type Options = typeof(defaultOptions)
 
 local function retry(callback: () -> (), retryOptions: RetryOptions?)
 	local options = tableext.combine(defaultOptions, retryOptions) :: Options
