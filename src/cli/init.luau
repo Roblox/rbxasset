@@ -12,7 +12,7 @@ local SUBCOMMANDS: { [string]: types.Subcommand } = {
 }
 
 local function getPossibleSubcommands()
-	local names = {}
+	local names: { string } = {}
 	for subcommandName in SUBCOMMANDS do
 		table.insert(names, subcommandName)
 	end
