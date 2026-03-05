@@ -1,4 +1,6 @@
-local serde = require("@lune/serde")
+local bufferToHex = require("@root/lib/bufferToHex")
+local crypto = require("@lute/crypto")
+local json = require("@std/json")
 
 type FormField = {
 	value: any,
@@ -10,7 +12,7 @@ local function createFormDataBody(boundary: string, data: { [string]: FormField 
 	local body = {}
 
 	for key, field in data do
-		local value = if field.contentType == "application/json" then serde.encode("json", field.value) else field.value
+		local value = if field.contentType == "application/json" then json.serialize(field.value) else field.value
 
 		local lines = {
 			`--{boundary}`,
@@ -30,7 +32,9 @@ local function createFormDataBody(boundary: string, data: { [string]: FormField 
 end
 
 local function createFormData(data: { [string]: FormField })
-	local boundary = "LuauFormBoundary" .. serde.hash("md5", tostring(math.random()))
+	local hash = bufferToHex(crypto.digest(crypto.hash.md5, tostring(math.random())))
+
+	local boundary = "LuauFormBoundary" .. hash
 	local body = createFormDataBody(boundary, data)
 
 	return {

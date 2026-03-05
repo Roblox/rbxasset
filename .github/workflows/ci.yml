@@ -19,27 +19,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute run install
 
       - name: Run unit tests
-        run: lune run test
-
-  test-e2e:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: Roblox/setup-foreman@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allow-external-github-orgs: true
-
-      - name: Install dependencies
-        run: lune run install
-
-      - name: Run end-to-end tests
-        run: lune run test-e2e
+        run: lute run test --e2e
         env:
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
 
@@ -55,10 +38,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
+        run: lute run install
 
       - name: Lint
-        run: lune run lint
+        run: lute run lint
 
   analyze:
     runs-on: ubuntu-latest
@@ -72,12 +55,9 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lune run install
-
-      - name: Setup Lune typedefs
-        run: lune setup
+        run: lute run install
 
       # MUS-2103 TODO: This will error in CI until Foreman is updated to install
       # the correct linux binary for luau-lsp
       - name: Analyze
-        run: lune run analyze
+        run: lute run analyze

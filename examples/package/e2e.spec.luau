@@ -1,24 +1,19 @@
-local frktest = require("@pkg/frktest")
-local fs = require("@lune/fs")
-local process = require("@lune/process")
-local serde = require("@lune/serde")
+local expect = require("@std/test/assert")
+local fs = require("@std/fs")
+local path = require("@std/path")
+local process = require("@std/process")
+local test = require("@std/test")
+local toml = require("@root/lib/toml")
 
+local appendTextForTesting = require("@scripts/lib/appendTextForTesting")
 local getAssetDetailsAsync = require("@root/requests/getAssetDetailsAsync")
 local getOrCreateAssetLockfile = require("@root/manifest/getOrCreateAssetLockfile")
 local readManifest = require("@root/manifest/readManifest")
 local run = require("@root/lib/run")
 
-local test = frktest.test
-local check = frktest.assert.check
-
-local ROOT_PATH = "examples/package"
-local MANIFEST_PATH = `{ROOT_PATH}/rbxasset.toml`
-
-local function appendTextForTesting(path: string, text: string)
-	local content = fs.readFile(path)
-	content ..= text
-	fs.writeFile(path, content)
-end
+local ROOT_PATH = path.resolve("examples/package")
+local MANIFEST_PATH = path.join(ROOT_PATH, "rbxasset.toml")
+local DEPLOY_SCRIPT = path.join(ROOT_PATH, "deploy.luau")
 
 local apiKey = process.env.ROBLOX_API_KEY
 assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar is set to a valid Open Cloud API key")
@@ -26,30 +21,27 @@ assert(apiKey, "End-to-end tests can only be run when the ROBLOX_API_KEY envvar 
 local lockfile = getOrCreateAssetLockfile(ROOT_PATH)
 local assetId = lockfile.assets.package.assetId
 
-run("rojo", { "build", "-o", "asset.rbxm" }, {
-	cwd = ROOT_PATH,
-})
-
 test.case("uploads rbxm to the Creator Store", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
 	local prevRevisionId = assetDetails.revisionId
 
-	local path = `{ROOT_PATH}/src/init.luau`
-	appendTextForTesting(path, `\nprint("New!")`)
+	local filePath = path.join(ROOT_PATH, "src/init.luau")
+	appendTextForTesting(filePath, `\nprint("New!")`)
 
-	local success, result = pcall(function()
-		run("lune", { "run", "deploy.luau", apiKey }, {
-			cwd = ROOT_PATH,
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
 		})
+		return nil
 	end)
 
-	run("git", { "restore", path })
+	run("git", { "restore", tostring(filePath) })
 
-	assert(success, result)
+	assert(success, err)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.not_equal(assetDetails.revisionId, prevRevisionId)
+	expect.neq(assetDetails.revisionId, prevRevisionId)
 end)
 
 test.case("text fields in rbxasest.toml get mirrored to the asset details", function()
@@ -62,31 +54,36 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.package.name = `{manifest.assets.package.name}\n({id})`
 	manifest.assets.package.description = `{manifest.assets.package.description}\n({id})`
 
-	fs.writeFile(MANIFEST_PATH, serde.encode("toml", manifest))
+	fs.writestringtofile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
 
-	run("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
-	})
+	local success, err = pcall(function()
+		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+			stdio = "inherit",
+		})
+		return nil
+	end)
 
-	run("git", { "restore", MANIFEST_PATH })
+	run("git", { "restore", tostring(MANIFEST_PATH) })
+
+	assert(success, err)
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.equal(assetDetails.displayName, manifest.assets.package.name)
-	check.equal(assetDetails.description, manifest.assets.package.description)
-	check.not_equal(assetDetails.revisionId, prevRevisionId)
+	expect.eq(assetDetails.displayName, manifest.assets.package.name)
+	expect.eq(assetDetails.description, manifest.assets.package.description)
+	expect.neq(assetDetails.revisionId, prevRevisionId)
 end)
 
-test.case("does not publish a new version when there are no changes", function()
+test.case("only publishes a new version when there are new changes", function()
 	local assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
 	local prevRevisionId = assetDetails.revisionId
 
-	run("lune", { "run", "deploy.luau", apiKey }, {
-		cwd = ROOT_PATH,
+	process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {
+		stdio = "inherit",
 	})
 
 	assetDetails = getAssetDetailsAsync(assetId, apiKey)
 
-	check.equal(assetDetails.revisionId, prevRevisionId)
+	expect.eq(assetDetails.revisionId, prevRevisionId)
 end)

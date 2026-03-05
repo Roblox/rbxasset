@@ -7,7 +7,7 @@ Deploy rbxm files from GitHub to the Creator Store.
 # Installation
 
 > [!NOTE]
-> [Lune](https://github.com/lune-org/lune) v0.9.3+ is required.
+> [Lute](https://github.com/luau-lang/lute) v0.1.0-nightly.20251217+ is required.
 
 ## Prebuilt zip (recommended)
 
@@ -24,8 +24,8 @@ Run the following commands to clone the repo, install dependencies, and build rb
 git clone https://github.com/Roblox/rbxasset.git
 cd rbxasset
 foreman install
-lune run install
-lune run build
+lute run install
+lute run build
 ```
 
 From there, drag and drop `build/rbxasset` to a place where you will require it via a Luau script.
@@ -54,25 +54,27 @@ This defines a `default` asset and a `production` environment to deploy to.
 Then create a Luau script to handle the deployment:
 
 ```luau
--- .lune/publish.luau
-local process = require("@lune/process")
+-- scripts/publish.luau
+local process = require("@std/process")
 
 local rbxasset = require("./path/to/rbxasset")
 
-local apiKey = process.args[1]
+local args = { ... }
+
+local apiKey = args[1]
 assert(apiKey, "argument #1 must be a valid Open Cloud API key")
 
 -- The rbxm file needs to be built manually. rbxasset makes no assumptions about
 -- how your project is setup, it only cares about having a file to upload. Note
 -- the filename `build.rbxm` matches the `model` field in rbxasset.toml
-process.exec("rojo", { "build", "-o", "build.rbxm" })
+process.system("rojo build -o build.rbxm")
 
 -- Publish the `default` asset defined in rbxasset.toml
-rbxasset.publishPackageAsync(process.cwd, "default", apiKey)
+rbxasset.publishPackageAsync(process.cwd(), "default", apiKey)
 ```
 
 ```sh
-$ lune run publish <API_KEY>
+$ lute run scripts/publish.luau <API_KEY>
 ```
 
 Where `<API_KEY>` represents an Open Cloud API key that has the following scopes:
@@ -94,7 +96,6 @@ Assets define how the asset will be deployed and shown on the Creator Store.
 | `environment` | `string`                | Defines which environment to deploy to. This value must equal one of the environments defined in the `environments` object                                    |
 | `description` | `string?`               | The description of the asset on the Creator Store                                                                                                             |
 | `icon`        | `string?`               | Path to the icon (png only) to display on the Creator Store                                                                                                   |
-| `description` | `string?`               | The description of the asset on the Creator Store                                                                                                             |
 | `type`        | `"Package" \| "Plugin"` | The type of asset to upload to the Creator Store. This must be set before the first publish as asset type is immutable once uploaded. Defaults to `"Package"` |
 
 ## Environments

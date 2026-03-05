@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@std/json")
 
 local fetch = require("@root/requests/fetch")
 
@@ -11,7 +11,11 @@ local function getAssetDetailsAsync(assetId: string, apiKey: string)
 		},
 	})
 
-	return serde.decode("json", res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting
+	-- to `any`
+	local assetDetails: any = json.deserialize(res.body)
+
+	return assetDetails
 end
 
 return getAssetDetailsAsync

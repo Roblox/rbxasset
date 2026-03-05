@@ -1,5 +1,6 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@std/fs")
+local json = require("@std/json")
+local path = require("@std/path")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -16,7 +17,7 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 local function publishAssetAsync(
-	projectPath: string,
+	projectPath: path.pathlike,
 	assetName: string,
 	asset: AssetConfig,
 	environment: EnvironmentConfig,
@@ -34,6 +35,9 @@ local function publishAssetAsync(
 
 	local assetId
 
+	local modelPath = path.join(projectPath, asset.model)
+	local modelContent = fs.readfiletostring(modelPath)
+
 	if assetDetails and assetDetails.assetId then
 		logging.info("publishing new version...")
 		local formData = createFormData({
@@ -45,7 +49,7 @@ local function publishAssetAsync(
 			},
 			fileContent = {
 				filename = asset.model,
-				value = fs.readFile(asset.model),
+				value = modelContent,
 				contentType = "model/x-rbxm",
 			},
 		})
@@ -59,7 +63,9 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = serde.decode("json", res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting
+		-- to `any`
+		local body: any = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 
@@ -83,7 +89,7 @@ local function publishAssetAsync(
 			},
 			fileContent = {
 				filename = asset.model,
-				value = fs.readFile(asset.model),
+				value = modelContent,
 				contentType = "model/x-rbxm",
 			},
 		})
@@ -97,7 +103,9 @@ local function publishAssetAsync(
 			body = formData.body,
 		})
 
-		local body = serde.decode("json", res.body)
+		-- FIXME: Narrow the return value of `json.deserialize` instead of casting
+		-- to `any`
+		local body: any = json.deserialize(res.body)
 
 		local operationRes = waitForAssetOperationAsync(body.operationId, apiKey)
 
@@ -118,7 +126,7 @@ local function publishAssetAsync(
 					assetId = assetId,
 				}),
 			}),
-		})
+		}) :: types.Lockfile
 
 		writeLockfile(projectPath, newLockfile)
 	end

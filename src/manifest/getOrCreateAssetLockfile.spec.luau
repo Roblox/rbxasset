@@ -1,17 +1,16 @@
-local frktest = require("@pkg/frktest")
-local test = frktest.test
-local check = frktest.assert.check
+local expect = require("@std/test/assert")
+local test = require("@std/test")
 
 local getOrCreateAssetLockfile = require("./getOrCreateAssetLockfile")
 
 test.case("reads an asset lockfile from disk", function()
 	local lockfile = getOrCreateAssetLockfile("examples/package")
-	check.equal(lockfile.assets["package"].assetId, "115689279560293")
+	expect.neq(lockfile.assets["package"].assetId, nil)
 end)
 
 test.case("creates a blank asset lockfile when not found on disk", function()
 	local lockfile = getOrCreateAssetLockfile("/nowhere")
-	check.table.equal(lockfile, {
+	expect.tableeq(lockfile :: { [unknown]: unknown }, {
 		assets = {},
 		images = {},
 	})

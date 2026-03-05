@@ -1,5 +1,6 @@
-local fs = require("@lune/fs")
-local serde = require("@lune/serde")
+local fs = require("@std/fs")
+local json = require("@std/json")
+local path = require("@std/path")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -8,12 +9,14 @@ local waitForAssetOperationAsync = require("@root/requests/waitForAssetOperation
 
 local function createImageAsync(
 	displayName: string,
-	imagePath: string,
+	imagePath: path.pathlike,
 	creatorId: number,
 	creatorType: types.CreatorType,
 	apiKey: string
 )
 	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
+
+	local imageContent = fs.readfiletostring(imagePath)
 
 	local formData = createFormData({
 		request = {
@@ -29,8 +32,8 @@ local function createImageAsync(
 			contentType = "application/json",
 		},
 		fileContent = {
-			filename = imagePath:match("[/\\](.+)$"),
-			value = fs.readFile(imagePath),
+			filename = path.basename(imagePath),
+			value = imageContent,
 			contentType = "image/png",
 		},
 	})
@@ -44,7 +47,8 @@ local function createImageAsync(
 		body = formData.body,
 	})
 
-	local body = serde.decode("json", res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local body: any = json.deserialize(res.body)
 
 	return waitForAssetOperationAsync(body.operationId, apiKey)
 end

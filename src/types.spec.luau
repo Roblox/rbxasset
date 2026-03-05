@@ -1,6 +1,5 @@
-local frktest = require("@pkg/frktest")
-local test = frktest.test
-local check = frktest.assert.check
+local expect = require("@std/test/assert")
+local test = require("@std/test")
 
 local types = require("./types")
 
@@ -24,7 +23,7 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_true(success)
+		expect.eq(success, true)
 	end)
 
 	test.case("accepts optional manifest values", function()
@@ -49,7 +48,7 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_true(success)
+		expect.eq(success, true)
 	end)
 
 	test.case("denies empty assets object", function()
@@ -65,8 +64,8 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
-		check.equal(message, "at least one asset must be defined in the manifest")
+		expect.eq(success, false)
+		expect.eq(message, "at least one asset must be defined in the manifest")
 	end)
 
 	test.case("denies empty environments object", function()
@@ -84,8 +83,8 @@ test.suite("validateManifest", function()
 			environments = {},
 		})
 
-		check.is_false(success)
-		check.equal(message, "at least one environment must be defined in the manifest")
+		expect.eq(success, false)
+		expect.eq(message, "at least one environment must be defined in the manifest")
 	end)
 
 	test.case("assets must map back to a valid environment", function()
@@ -110,8 +109,8 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
-		check.equal(message, `asset "main" attempts to use the environment "does-not-exist" which does not exist`)
+		expect.eq(success, false)
+		expect.eq(message, `asset "main" attempts to use the environment "does-not-exist" which does not exist`)
 	end)
 
 	test.case("denies optional manifest values of the wrong type", function()
@@ -135,13 +134,13 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
+		expect.eq(success, false)
 	end)
 
 	test.case("denies empty object", function()
 		local success = types.validateManifest({})
 
-		check.is_false(success)
+		expect.eq(success, false)
 	end)
 
 	test.case("denies invalid types", function()
@@ -163,7 +162,7 @@ test.suite("validateManifest", function()
 			},
 		})
 
-		check.is_false(success)
+		expect.eq(success, false)
 	end)
 end)
 
@@ -178,7 +177,7 @@ test.suite("validateLockfile", function()
 			images = {},
 		})
 
-		check.is_true(success)
+		expect.eq(success, true)
 	end)
 
 	test.case("handles storing images", function()
@@ -196,12 +195,12 @@ test.suite("validateLockfile", function()
 			},
 		})
 
-		check.is_true(success)
+		expect.eq(success, true)
 	end)
 
 	test.case("denies empty object", function()
 		local success = types.validateLockfile({})
 
-		check.is_false(success)
+		expect.eq(success, false)
 	end)
 end)

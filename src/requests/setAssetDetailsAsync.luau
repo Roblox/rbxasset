@@ -1,4 +1,4 @@
-local serde = require("@lune/serde")
+local json = require("@std/json")
 
 local createFormData = require("@root/requests/forms/createFormData")
 local fetch = require("@root/requests/fetch")
@@ -33,7 +33,8 @@ local function setAssetDetailsAsync(assetId: string, apiKey: string, details: As
 		body = formData.body,
 	})
 
-	local body: OperationResponse = serde.decode("json", res.body)
+	-- FIXME: Narrow the return value of `json.deserialize` instead of casting to `any`
+	local body: OperationResponse = json.deserialize(res.body) :: any
 
 	if body.message then
 		error(body.message)
