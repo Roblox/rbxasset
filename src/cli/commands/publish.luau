@@ -1,6 +1,6 @@
 local cli = require("@pkg/cli")
 
-local parseApiKey = require("@root/cli/parsers/parseProjectPath")
+local parseApiKey = require("@root/cli/parsers/parseApiKey")
 local parseProjectPath = require("@root/cli/parsers/parseProjectPath")
 local publishPackageAsync = require("@root/requests/publishPackageAsync")
 local publishWorkspaceAsync = require("@root/requests/publishWorkspaceAsync")

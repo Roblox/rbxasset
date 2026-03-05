@@ -19,10 +19,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lute scripts/install.luau
+        run: lute run install
 
       - name: Run unit tests
-        run: lute scripts/test.luau --e2e
+        run: lute run test --e2e
         env:
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
 
@@ -38,10 +38,10 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lute scripts/install.luau
+        run: lute run install
 
       - name: Lint
-        run: lute scripts/lint.luau
+        run: lute run lint
 
   analyze:
     runs-on: ubuntu-latest
@@ -55,9 +55,7 @@ jobs:
           allow-external-github-orgs: true
 
       - name: Install dependencies
-        run: lute scripts/install.luau
+        run: lute run install
 
-      # MUS-2103 TODO: This will error in CI until Foreman is updated to install
-      # the correct linux binary for luau-lsp
       - name: Analyze
-        run: lute scripts/analyze.luau
+        run: lute run analyze

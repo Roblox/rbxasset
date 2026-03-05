@@ -2,7 +2,7 @@ local run = require("@root/lib/run")
 
 local foldersToLint = {
 	"examples",
-	"scripts",
+	".lute",
 	"src",
 }
 
