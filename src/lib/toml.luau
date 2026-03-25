@@ -1,6 +1,4 @@
---!nonstrict
-
--- upstream: https://github.com/luau-lang/lute/blob/d3ab7a81840aa62e887d5566fbe66f560b1f3227/batteries/toml.luau
+-- upstream: https://github.com/luau-lang/lute/blob/4798710fb096da97259c389a286b41f91e97b9ad/batteries/toml.luau
 
 local toml = {}
 
@@ -10,7 +8,7 @@ type SerializerState = {
 	cursor: number,
 }
 
-local function serializeValue(value: string | number)
+local function serializeValue(value: string | number): string
 	if typeof(value) == "string" then
 		value = string.gsub(value, "\\", "\\\\")
 		value = string.gsub(value, "\n", "\\n")
@@ -27,17 +25,14 @@ local function serializeValue(value: string | number)
 	end
 end
 
--- TOML bare keys may only contain [A-Za-z0-9_-]. Any other key must be quoted.
-local function serializeKey(key: string): string
-	if string.match(key, "^[%w_%-]+$") then
-		return key
+local function quoteKey(key: string): string
+	if not string.match(key, "^[%w_-]+$") then
+		return '"' .. key .. '"'
 	end
-	key = string.gsub(key, "\\", "\\\\")
-	key = string.gsub(key, '"', '\\"')
-	return '"' .. key .. '"'
+	return key
 end
 
-local function hasNestedTables(tbl: { [unknown]: unknown })
+local function hasNestedTables(tbl: { [unknown]: unknown }): boolean
 	for _, v in tbl do
 		if typeof(v) == "table" and next(v) ~= nil then
 			return true
@@ -55,7 +50,7 @@ local function tableToToml(tbl: { [any]: any }, parent: string?): string
 		if typeof(v) == "table" and next(v) ~= nil then
 			if #v > 0 then
 				for _, entry in v do
-					result ..= "\n[[" .. (parent and parent .. "." or "") .. serializeKey(k) .. "]]\n"
+					result ..= "\n[[" .. (parent and parent .. "." or "") .. quoteKey(k) .. "]]\n"
 					result ..= tableToToml(entry, nil)
 				end
 			else
@@ -63,12 +58,12 @@ local function tableToToml(tbl: { [any]: any }, parent: string?): string
 			end
 		else
 			hasDirectValues = true
-			result ..= k .. " = " .. serializeValue(v) .. "\n"
+			result ..= quoteKey(k) .. " = " .. serializeValue(v) .. "\n"
 		end
 	end
 
 	for k, v in subTables do
-		local key = parent and (parent .. "." .. serializeKey(k)) or serializeKey(k)
+		local key = parent and (parent .. "." .. quoteKey(k)) or quoteKey(k)
 
 		if hasNestedTables(v) == true then
 			result ..= tableToToml(v, key)
@@ -95,7 +90,42 @@ type DeserializerState = {
 	cursor: number,
 }
 
-local function skipWhitespace(state: DeserializerState)
+local function splitTablePath(path: string): { string }
+	local parts = {}
+	local index = 1
+	local pathLen = string.len(path)
+
+	while index <= pathLen do
+		local symbol = string.sub(path, index, index)
+		if symbol == "." then
+			index += 1
+		elseif symbol == '"' or symbol == "'" then
+			local closePos = string.find(path, symbol, index + 1, true) or pathLen + 1
+			table.insert(parts, string.sub(path, index + 1, closePos - 1))
+			index = closePos + 1
+		else
+			local nextSpecial = string.find(path, "[.\"']", index)
+			local segEnd = if nextSpecial then nextSpecial - 1 else pathLen
+			table.insert(parts, string.sub(path, index, segEnd))
+			index = segEnd + 1
+		end
+	end
+
+	return parts
+end
+
+local function ensurePath(root: { [string]: unknown }, parts: { string }, depth: number?): { [string]: unknown }
+	local current = root
+	for i = 1, depth or #parts do
+		if not current[parts[i]] then
+			current[parts[i]] = {}
+		end
+		current = current[parts[i]] :: { [string]: unknown }
+	end
+	return current
+end
+
+local function skipWhitespace(state: DeserializerState): ()
 	local pos = state.cursor
 	while pos <= string.len(state.buf) and string.match(string.sub(state.buf, pos, pos), "%s") do
 		pos += 1
@@ -103,68 +133,14 @@ local function skipWhitespace(state: DeserializerState)
 	state.cursor = pos
 end
 
-local function readLine(state: DeserializerState)
+local function readLine(state: DeserializerState): string
 	local nextLine = string.find(state.buf, "\n", state.cursor) or string.len(state.buf) + 1
 	local line = string.sub(state.buf, state.cursor, nextLine - 1)
 	state.cursor = nextLine + 1
 	return line
 end
 
--- Splits a TOML key path (e.g. `a."b.c".d`) into its component keys,
--- honouring both double- and single-quoted segments.
-local function parseKeyPath(path: string): { string }
-	local keys = {}
-	local pos = 1
-
-	while pos <= #path do
-		pos = string.find(path, "[^%s]", pos) or (#path + 1)
-
-		if pos > #path then
-			break
-		end
-
-		local char = string.sub(path, pos, pos)
-
-		if char == '"' or char == "'" then
-			local quote = char
-			local key = ""
-			pos += 1
-
-			while pos <= #path do
-				local c = string.sub(path, pos, pos)
-				if c == "\\" and quote == '"' then
-					pos += 1
-					key ..= string.sub(path, pos, pos)
-				elseif c == quote then
-					pos += 1
-					break
-				else
-					key ..= c
-				end
-				pos += 1
-			end
-
-			table.insert(keys, key)
-		else
-			local dotPos = string.find(path, "%.", pos) or (#path + 1)
-			local key = string.match(string.sub(path, pos, dotPos - 1), "^%s*(.-)%s*$") :: string
-			pos = dotPos
-
-			if key ~= "" then
-				table.insert(keys, key)
-			end
-		end
-
-		pos = string.find(path, "[^%s]", pos) or (#path + 1)
-		if pos <= #path and string.sub(path, pos, pos) == "." then
-			pos += 1
-		end
-	end
-
-	return keys
-end
-
-local function deserialize(input: string)
+local function deserialize(input: string): { [string]: unknown }
 	-- Normalize line endings: Replace Windows (\r\n) and old Mac (\r) with Unix (\n)
 	input = string.gsub(input, "\r\n", "\n")
 	input = string.gsub(input, "\r", "\n")
@@ -173,7 +149,7 @@ local function deserialize(input: string)
 		buf = input,
 		cursor = 1,
 	}
-	local result = {}
+	local result: { [string]: unknown } = {}
 	local currentTable = result
 	local arrayTables = {}
 
@@ -186,34 +162,31 @@ local function deserialize(input: string)
 		end
 
 		if string.match(line, "^%[%[(.-)%]%]$") then
-			local tableName = string.match(line, "^%[%[(.-)%]%]$")
-			arrayTables[tableName] = arrayTables[tableName] or {}
+			local tableName = string.match(line, "^%[%[(.-)%]%]$") or ""
+
+			if not arrayTables[tableName] then
+				arrayTables[tableName] = {}
+				local parts = splitTablePath(tableName)
+				local leaf = parts[#parts]
+				local _parent = ensurePath(result, parts, #parts - 1)
+				_parent[leaf] = arrayTables[tableName]
+			end
 
 			local newEntry = {}
 			table.insert(arrayTables[tableName], newEntry)
-
-			result[tableName] = arrayTables[tableName]
 			currentTable = newEntry
 		elseif string.match(line, "^%[(.-)%]$") then
 			local tablePath = string.match(line, "^%[(.-)%]$")
-			local parent = result
-
-			for _, section in parseKeyPath(tablePath :: string) do
-				if not parent[section] then
-					parent[section] = {}
-				end
-				parent = parent[section]
-			end
-
-			currentTable = parent
+			currentTable = ensurePath(result, splitTablePath(tablePath :: string))
 		elseif string.match(line, "^(.-)%s*=%s*(.-)$") then
 			local key, value = string.match(line, "^(.-)%s*=%s*(.-)$")
-			-- selene: allow(incorrect_standard_library_use)
-			assert(key and value)
+			assert(key and value, "Luau")
 			key = string.match(key, "^%s*(.-)%s*$")
 			value = string.match(value, "^%s*(.-)%s*$")
-			-- selene: allow(incorrect_standard_library_use)
-			assert(key and value)
+			assert(key and value, "Luau")
+			if string.match(key, '^"(.*)"$') or string.match(key, "^'(.*)'$") then
+				key = string.sub(key, 2, -2)
+			end
 			if string.match(value, '^"(.*)"$') or string.match(value, "^'(.*)'$") then
 				value = string.sub(value, 2, -2)
 				value = string.gsub(value, "\\\\", "\\")
@@ -230,8 +203,7 @@ local function deserialize(input: string)
 			elseif value == "-inf" then
 				value = -math.huge
 			elseif value == "nan" then
-				--lute-lint-ignore(divide_by_zero)
-				value = 0 / 0
+				value = math.nan
 			end
 
 			currentTable[key] = value
