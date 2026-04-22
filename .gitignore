@@ -5,6 +5,7 @@
 build
 temp
 pkg
+Packages
 
 # Roblox
 *.rbxm*

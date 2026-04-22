@@ -1,12 +1,13 @@
+
 [assets.package]
-name = "Example Package"
+name = "Example Package\n(1776896861)"
 environment = "production"
-description = "Longform description"
-icon = "icon.png"
 model = "asset.rbxm"
+icon = "icon.png"
+description = "Longform description\n(1776896861)"
 
 [environments.production]
-creatorId = 8701739411
-creatorType = "User"
-universeId = 8046529594
 placeId = 87060735635538
+creatorId = 8701739411
+universeId = 8046529594
+creatorType = "User"

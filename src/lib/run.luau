@@ -1,5 +1,5 @@
 local process = require("@std/process")
-local richterm = require("@pkg/richterm")
+local richterm = require("@pkg/Lute@v1.0.0/batteries/richterm")
 
 type Options = {
 	cwd: string?,

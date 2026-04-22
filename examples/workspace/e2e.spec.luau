@@ -77,7 +77,7 @@ test.case("text fields in rbxasest.toml get mirrored to the asset details", func
 	manifest.assets.plugin.name = `{manifest.assets.plugin.name} ({id})`
 	manifest.assets.plugin.description = `{manifest.assets.plugin.description}\n({id})`
 
-	fs.writestringtofile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
+	fs.writeStringToFile(MANIFEST_PATH, toml.serialize(manifest :: { [unknown]: unknown }))
 
 	local success, err = pcall(function()
 		process.run({ "lute", tostring(DEPLOY_SCRIPT) }, {

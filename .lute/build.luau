@@ -18,11 +18,11 @@ local ARTIFACT_NAME = "rbxasset"
 local ARCHIVE_NAME = "rbxasset.zip"
 local ARTIFACT_PATH = path.join(BUILD_PATH, ARTIFACT_NAME)
 
-fs.removedirectory(BUILD_PATH, {
+fs.removeDirectory(BUILD_PATH, {
 	recursive = true,
 })
-fs.createdirectory(ARTIFACT_PATH, {
-	makeparents = true,
+fs.createDirectory(ARTIFACT_PATH, {
+	makeParents = true,
 })
 
 for _, includeName in INCLUDES do

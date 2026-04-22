@@ -1,4 +1,4 @@
-local pp = require("@pkg/pp")
+local pp = require("@pkg/Lute@v1.0.0/batteries/pp")
 local tableext = require("@std/tableext")
 local task = require("@lute/task")
 

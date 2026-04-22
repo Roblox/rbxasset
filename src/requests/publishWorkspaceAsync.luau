@@ -6,7 +6,7 @@ local publishImagesAsync = require("@root/requests/publishImagesAsync")
 local readManifest = require("@root/manifest/readManifest")
 local setAssetIconAsync = require("@root/requests/setAssetIconAsync")
 
-local function publishWorkspaceAsync(projectPath: path.pathlike, apiKey: string)
+local function publishWorkspaceAsync(projectPath: path.Pathlike, apiKey: string)
 	local manifest = readManifest(projectPath)
 
 	for assetName, asset in manifest.assets do

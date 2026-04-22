@@ -1,6 +1,6 @@
 local fs = require("@std/fs")
 local path = require("@std/path")
-local pp = require("@pkg/pp")
+local pp = require("@pkg/Lute@v1.0.0/batteries/pp")
 local toml = require("@root/lib/toml")
 
 local constants = require("@root/constants")
@@ -10,14 +10,14 @@ local types = require("@root/types")
 
 type Lockfile = types.Lockfile
 
-local function getOrCreateAssetLockfile(packagePath: path.pathlike): Lockfile
+local function getOrCreateAssetLockfile(packagePath: path.Pathlike): Lockfile
 	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
 
 	-- It's expected that the lockfile won't exist in certain situations, like
 	-- on the first upload of the asset. So we just catch any error here
 	local content: string
 	local success = pcall(function()
-		content = fs.readfiletostring(lockfilePath)
+		content = fs.readFileToString(lockfilePath)
 	end)
 
 	local parsedLockfile = if success then toml.deserialize(content) else nil

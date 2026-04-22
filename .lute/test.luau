@@ -1,4 +1,4 @@
-local cli = require("@pkg/cli")
+local cli = require("@pkg/Lute@v1.0.0/batteries/cli")
 local process = require("@std/process")
 
 local dotenv = require("./lib/dotenv")

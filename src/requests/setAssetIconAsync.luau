@@ -13,7 +13,7 @@ type AssetConfig = types.AssetConfig
 local ASSETS_BASE_URL = "https://apis.roblox.com/assets/v1"
 
 local function setAssetIconAsync(
-	projectPath: path.pathlike,
+	projectPath: path.Pathlike,
 	assetName: string,
 	assetConfig: AssetConfig,
 	apiKey: string
