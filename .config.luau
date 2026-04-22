@@ -1,6 +1,5 @@
 return {
 	luau = {
-
 		languagemode = "strict",
 		aliases = {
 			lint = "~/.lute/typedefs/1.0.0/lint",

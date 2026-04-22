@@ -1,7 +1,6 @@
-
 [assets.package]
 assetId = "115689279560293"
 
 [images."icon.png"]
-hash = "fac185770cf5e824d4c0a9b59e547df42dc10011c5ad139bfc2c7e1507eef631"
 assetId = "107438925431083"
+hash = "fac185770cf5e824d4c0a9b59e547df42dc10011c5ad139bfc2c7e1507eef631"
