@@ -4,13 +4,13 @@ local path = require("@std/path")
 local run = require("@root/lib/run")
 
 local INCLUDES = {
-	".luaurc",
+	".config.luau",
 	"init.luau",
 	"LICENSE",
 	"README.md",
 
 	"src/",
-	"pkg/",
+	"Packages/",
 }
 
 local BUILD_PATH = "build"
