@@ -5,6 +5,8 @@
 build
 temp
 pkg
+Packages
+loom.lock.luau
 
 # Roblox
 *.rbxm*

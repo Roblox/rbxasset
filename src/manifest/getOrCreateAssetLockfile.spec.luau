@@ -10,7 +10,7 @@ end)
 
 test.case("creates a blank asset lockfile when not found on disk", function()
 	local lockfile = getOrCreateAssetLockfile("/nowhere")
-	expect.tableeq(lockfile :: { [unknown]: unknown }, {
+	expect.eq(lockfile :: { [unknown]: unknown }, {
 		assets = {},
 		images = {},
 	})

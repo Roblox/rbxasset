@@ -1,4 +1,4 @@
-local t: any = require("@pkg/t")
+local t: any = require("@pkg/t@v3.0.0/lib")
 
 local types = {}
 

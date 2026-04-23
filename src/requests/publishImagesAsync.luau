@@ -13,7 +13,7 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 type PendingImage = {
-	path: path.pathlike,
+	path: path.Pathlike,
 	filename: string,
 	assetId: string,
 }
@@ -23,7 +23,7 @@ local function toSha256String(str: string): string
 end
 
 local function publishImagesAsync(
-	projectPath: path.pathlike,
+	projectPath: path.Pathlike,
 	assetConfig: AssetConfig,
 	environment: EnvironmentConfig,
 	apiKey: string
@@ -36,7 +36,7 @@ local function publishImagesAsync(
 	local icon = assetConfig.icon
 	if icon then
 		local iconPath = path.join(projectPath, icon)
-		local iconContent = fs.readfiletostring(iconPath)
+		local iconContent = fs.readFileToString(iconPath)
 
 		logging.info(`syncing package icon at {iconPath}`)
 
@@ -78,7 +78,7 @@ local function publishImagesAsync(
 
 		for index, thumbnailFilename in thumbnails do
 			local thumbnailPath = path.join(projectPath, thumbnailFilename)
-			local thumbnailContent = fs.readfiletostring(thumbnailPath)
+			local thumbnailContent = fs.readFileToString(thumbnailPath)
 			local thumbnailHash = toSha256String(thumbnailContent)
 
 			local existingThumbnail = existingImages and existingImages[thumbnailFilename]
@@ -121,7 +121,7 @@ local function publishImagesAsync(
 		newAssetLockfile.images = newAssetLockfile.images or {}
 
 		for _, pendingImage in pendingImages do
-			local pendingImageContent = fs.readfiletostring(pendingImage.path)
+			local pendingImageContent = fs.readFileToString(pendingImage.path)
 
 			newAssetLockfile.images[pendingImage.filename] = {
 				assetId = pendingImage.assetId,

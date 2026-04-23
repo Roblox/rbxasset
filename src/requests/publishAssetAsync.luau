@@ -17,7 +17,7 @@ type AssetConfig = types.AssetConfig
 type EnvironmentConfig = types.EnvironmentConfig
 
 local function publishAssetAsync(
-	projectPath: path.pathlike,
+	projectPath: path.Pathlike,
 	assetName: string,
 	asset: AssetConfig,
 	environment: EnvironmentConfig,
@@ -36,7 +36,7 @@ local function publishAssetAsync(
 	local assetId
 
 	local modelPath = path.join(projectPath, asset.model)
-	local modelContent = fs.readfiletostring(modelPath)
+	local modelContent = fs.readFileToString(modelPath)
 
 	if assetDetails and assetDetails.assetId then
 		logging.info("publishing new version...")

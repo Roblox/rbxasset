@@ -8,9 +8,9 @@ local types = require("@root/types")
 
 type Lockfile = types.Lockfile
 
-local function writeLockfile(packagePath: path.pathlike, lockfile: Lockfile)
+local function writeLockfile(packagePath: path.Pathlike, lockfile: Lockfile)
 	local lockfilePath = path.join(packagePath, constants.ASSET_LOCKFILE_FILENAME)
-	fs.writestringtofile(lockfilePath, toml.serialize(lockfile :: { [unknown]: unknown }))
+	fs.writeStringToFile(lockfilePath, toml.serialize(lockfile :: { [unknown]: unknown }))
 	logging.debug(`wrote asset lockfile {lockfilePath}`)
 end
 

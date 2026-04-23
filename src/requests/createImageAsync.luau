@@ -9,14 +9,14 @@ local waitForAssetOperationAsync = require("@root/requests/waitForAssetOperation
 
 local function createImageAsync(
 	displayName: string,
-	imagePath: path.pathlike,
+	imagePath: path.Pathlike,
 	creatorId: number,
 	creatorType: types.CreatorType,
 	apiKey: string
 )
 	local creatorIdKey = if creatorType == types.CreatorType.User then "userId" else "groupId"
 
-	local imageContent = fs.readfiletostring(imagePath)
+	local imageContent = fs.readFileToString(imagePath)
 
 	local formData = createFormData({
 		request = {
